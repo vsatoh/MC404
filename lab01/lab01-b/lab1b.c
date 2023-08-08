@@ -52,26 +52,26 @@ void _start()
 /* Aloca um buffer com 10 bytes.*/
 char buffer[10];
 
+
+
 int main()
 {
     /* Lê uma string da entrada padrão */
     int n = read(STDIN_FD, (void*) buffer, 10);
-    int resultado;
+    char resultado;
 
     if(buffer[2] == '+') {
-        resultado = buffer[0] - '0' + buffer[4] - '0';
+        buffer[0]  = buffer[0] + buffer[4] - '0';
     }
     else if(buffer[2] == '-') {
-        resultado = buffer[0] - buffer[4];
+        buffer[0]  = buffer[0] - buffer[4] + '0';
     }
     else if(buffer[2] == '*') {
-        resultado = (buffer[0] - '0') * (buffer[4] - '0');
+        buffer[0]  = (buffer[0] - '0') * (buffer[4] - '0') + '0';
     }
-    buffer[n] = resultado;
-
     /* Imprime a string lida e os dois caracteres adicionados 
     * na saída padrão. */
-    write(STDOUT_FD, (void*) buffer, n+2);
+    write(STDOUT_FD, (void*) buffer, n);
 
     return 0;
 }
