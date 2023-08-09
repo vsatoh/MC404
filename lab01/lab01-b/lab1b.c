@@ -57,21 +57,23 @@ char buffer[10];
 int main()
 {
     /* Lê uma string da entrada padrão */
-    int n = read(STDIN_FD, (void*) buffer, 10);
-    char resultado;
+    int n = read(STDIN_FD, (void*) buffer, 5);
+    char resultado[2];
 
     if(buffer[2] == '+') {
-        buffer[0]  = buffer[0] + buffer[4] - '0';
+        resultado[0]  = buffer[0] + buffer[4] - '0';
     }
     else if(buffer[2] == '-') {
-        buffer[0]  = buffer[0] - buffer[4] + '0';
+        resultado[0]  = buffer[0] - buffer[4] + '0';
     }
     else if(buffer[2] == '*') {
-        buffer[0]  = (buffer[0] - '0') * (buffer[4] - '0') + '0';
+        resultado[0]  = (buffer[0] - '0') * (buffer[4] - '0') + '0';
     }
+    resultado[1] = '\n';
+    
     /* Imprime a string lida e os dois caracteres adicionados 
     * na saída padrão. */
-    write(STDOUT_FD, (void*) buffer, n);
+    write(STDOUT_FD, (void*) resultado, 2);
 
     return 0;
 }

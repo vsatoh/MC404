@@ -110,7 +110,7 @@ main:
 	lui	a1, %hi(buffer)
 	addi	a1, a1, %lo(buffer)
 	sw	a1, -24(s0)
-	li	a2, 10
+	li	a2, 5
 	call	read
 	mv	a1, a0
 	lw	a0, -24(s0)
@@ -120,13 +120,13 @@ main:
 	bne	a0, a1, .LBB4_2
 	j	.LBB4_1
 .LBB4_1:
-	lui	a1, %hi(buffer)
-	addi	a2, a1, %lo(buffer)
-	lb	a0, %lo(buffer)(a1)
-	lb	a2, 4(a2)
-	add	a0, a0, a2
+	lui	a0, %hi(buffer)
+	addi	a1, a0, %lo(buffer)
+	lb	a0, %lo(buffer)(a0)
+	lb	a1, 4(a1)
+	add	a0, a0, a1
 	addi	a0, a0, -48
-	sb	a0, %lo(buffer)(a1)
+	sb	a0, -18(s0)
 	j	.LBB4_8
 .LBB4_2:
 	lui	a0, %hi(buffer)
@@ -136,13 +136,13 @@ main:
 	bne	a0, a1, .LBB4_4
 	j	.LBB4_3
 .LBB4_3:
-	lui	a1, %hi(buffer)
-	addi	a2, a1, %lo(buffer)
-	lb	a0, %lo(buffer)(a1)
-	lb	a2, 4(a2)
-	sub	a0, a0, a2
+	lui	a0, %hi(buffer)
+	addi	a1, a0, %lo(buffer)
+	lb	a0, %lo(buffer)(a0)
+	lb	a1, 4(a1)
+	sub	a0, a0, a1
 	addi	a0, a0, 48
-	sb	a0, %lo(buffer)(a1)
+	sb	a0, -18(s0)
 	j	.LBB4_7
 .LBB4_4:
 	lui	a0, %hi(buffer)
@@ -152,25 +152,26 @@ main:
 	bne	a0, a1, .LBB4_6
 	j	.LBB4_5
 .LBB4_5:
-	lui	a1, %hi(buffer)
-	addi	a2, a1, %lo(buffer)
-	lb	a0, %lo(buffer)(a1)
+	lui	a0, %hi(buffer)
+	addi	a1, a0, %lo(buffer)
+	lb	a0, %lo(buffer)(a0)
 	addi	a0, a0, -48
-	lb	a2, 4(a2)
-	addi	a2, a2, -48
-	mul	a0, a0, a2
+	lb	a1, 4(a1)
+	addi	a1, a1, -48
+	mul	a0, a0, a1
 	addi	a0, a0, 48
-	sb	a0, %lo(buffer)(a1)
+	sb	a0, -18(s0)
 	j	.LBB4_6
 .LBB4_6:
 	j	.LBB4_7
 .LBB4_7:
 	j	.LBB4_8
 .LBB4_8:
-	lw	a2, -16(s0)
-	lui	a0, %hi(buffer)
-	addi	a1, a0, %lo(buffer)
+	li	a0, 10
+	sb	a0, -17(s0)
 	li	a0, 1
+	addi	a1, s0, -18
+	li	a2, 2
 	call	write
 	li	a0, 0
 	lw	ra, 28(sp)
