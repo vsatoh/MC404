@@ -69,14 +69,16 @@ int converte_char_int(char str[], int n) {
 
 int converte_binario(int num, int n) {
     
+
 }
 
 char converte_int_char(int num, int n, char str[]) {
     for(int i = 0; i < n; i++) {
         str[i] = num/potencia(10, n-i) + '0';
     }
-
 }
+
+
 
 int main()
 {
