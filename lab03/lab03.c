@@ -67,14 +67,27 @@ int converte_char_int(char str[], int n) {
     return numero_final;
 }
 
-int converte_binario(int num, int pos) {
+int converte_dec_binario(int num) {
     if(num == 1 || num == 0) {
         return num;
     }
-    if(num%2 == 0) {
-        return converte_binario(num/2, pos+1)*10 + num%2*potencia(10, pos);
+    else if(num%2 == 0) {
+        return converte_binario(num/2)*10;
     }
-    return converte_binario(num/2, pos+1) + num%2*potencia(10, pos);
+    return converte_binario(num/2)*10 + 1;
+}
+
+int converte_hex_dec(char str[], int n) {
+    char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < 15; j++) {
+            if(str[i] == hex[j]) {
+                
+            }
+        }
+    }
+
 }
 
 char converte_int_char(int num, int n, char str[]) {
@@ -92,15 +105,14 @@ int main()
     scanf("%s ", str);
 
     int num = converte_char_int(str,n);
-    printf("%d", num);
-    // num += num;
+    num += num;
 
     // for(int i = 1; i <= n; i++) {
     //     str[i-1] = num/potencia(10, n-i) + '0';
     //     num = num%potencia(10, n-i);
 
     // }
-    num = converte_binario(num, 0);
+    num = converte_binario(num);
     printf("%d", num);
     // for(int i = 0; i < n; i++) {
     //     printf("%c", str[i]);
