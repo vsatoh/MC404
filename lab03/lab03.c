@@ -67,37 +67,44 @@ int converte_char_int(char str[], int n) {
     return numero_final;
 }
 
-int converte_binario(int num, int n) {
-    
-
+int converte_binario(int num, int pos) {
+    if(num == 1 || num == 0) {
+        return num;
+    }
+    if(num%2 == 0) {
+        return converte_binario(num/2, pos+1)*10 + num%2*potencia(10, pos);
+    }
+    return converte_binario(num/2, pos+1) + num%2*potencia(10, pos);
 }
 
 char converte_int_char(int num, int n, char str[]) {
     for(int i = 0; i < n; i++) {
         str[i] = num/potencia(10, n-i) + '0';
     }
+
 }
-
-
 
 int main()
 {
     char str[20];
     //int n = read(STDIN_FD, str, 20);
-    int n = 3;
+    int n = 2;
     scanf("%s ", str);
 
     int num = converte_char_int(str,n);
-    num += num;
+    printf("%d", num);
+    // num += num;
 
-    for(int i = 1; i <= n; i++) {
-        str[i-1] = num/potencia(10, n-i) + '0';
-        num = num%potencia(10, n-i);
+    // for(int i = 1; i <= n; i++) {
+    //     str[i-1] = num/potencia(10, n-i) + '0';
+    //     num = num%potencia(10, n-i);
 
-    }
-    for(int i = 0; i < n; i++) {
-        printf("%c", str[i]);
-    }
+    // }
+    num = converte_binario(num, 0);
+    printf("%d", num);
+    // for(int i = 0; i < n; i++) {
+    //     printf("%c", str[i]);
+    // }
     //write(STDOUT_FD, str, n);
     return 0;
 }
