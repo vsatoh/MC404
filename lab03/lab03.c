@@ -51,6 +51,13 @@
 // #define STDIN_FD  0
 // #define STDOUT_FD 1
 
+void imprime(char str[], int n) {
+    for(int i = 0; i < n; i++) {
+        printf("%c", str[i]);
+    }
+    printf("\n");
+}
+
 int potencia(int num_base, int n) {
     int num_pot = 1;
     for(int i = 0; i < n; i++) {
@@ -67,17 +74,79 @@ int converte_char_int(char str[], int n) {
     return numero_final;
 }
 
-int converte_dec_binario(int num) {
-    if(num == 1 || num == 0) {
-        return num;
+void converte_dec_binario(int num) {
+    int n = 0;
+    int num_aux = num;
+    while (num_aux != 0)
+    {
+        num_aux = num_aux/2;
+        n++;
     }
-    else if(num%2 == 0) {
-        return converte_dec_binario(num/2)*10;
+    char resp[n+2];
+    resp[0] = '0';
+    resp[1] = 'b';
+    for(int i = n+1; i >= 2; i--) {
+        if(num%2 == 0) {
+            resp[i] = '0';
+        } 
+        else {
+            resp[i] = '1';
+        }
+        num=num/2;
     }
-    return converte_dec_binario(num/2)*10 + 1;
+    for(int i = 0; i < n+2; i++) {
+        printf("%c", resp[i]);
+    }    
 }
 
-int converte_hex_dec(char str[], int n) {
+
+
+int polinomio_bin(char str[], int n) {
+    int num = 0;
+    for(int i = 0; i < n; i++) {
+        if(str[i] == '1') {
+            num += potencia(2,n-1-i);
+        }
+    }
+    return num;
+}
+
+int soma_um_bin(char str[], int n) {
+    int i = n-1, aux = 0, num;
+    while (aux == 0) {
+        if(str[i] == '0') {
+            str[i] = '1';
+            aux = 1;
+        }
+        else {
+            str[i] = '0';
+        }
+        i--;
+    }
+    num = polinomio_bin(str, n);
+    return num;
+}
+
+int converte_bin_dec(char str[], int n) {
+    char bin_cp2[n];
+    int num;
+    if(str[0] == '1') {
+        for(int i = 0; i < n; i++) {
+            if(str[i]== '1') {
+                bin_cp2[i] = '0';
+            }
+            else {
+                bin_cp2[i] = '1';
+            }
+        }
+        num = soma_um_bin(bin_cp2, n);//ta convertendo o primeiro
+        return num;
+    }
+    num = polinomio_bin(str, n);
+    return num;
+}
+
+void converte_hex_bin(char str[], int n) {
     char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
     int num = 0;
     for(int i = 0; i < n; i++) {
@@ -87,33 +156,94 @@ int converte_hex_dec(char str[], int n) {
             }
         }
     }
-    return num;
+    converte_dec_binario(num);
 }
 
-// char converte_int_char(int num, int n, char str[]) {
-//     for(int i = 0; i < n; i++) {
-//         str[i] = num/potencia(10, n-i) + '0';
-//     }
+void converter_hex_dec(char str[], int n) {
+    char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    int num = 0;
+    for(int i = 0; i < n; i++) {
+        for(int j = 0; j < 16; j++) {
+            if(str[i] == hex[j]) {
+                num+=j*potencia(16,n-1-i);
+            }
+        }
+    }
+    n = 0;
+    int num_aux = num;
+    while (num_aux != 0)
+    {
+        num_aux = num_aux/2;
+        n++;
+    }
+    char resp[n];
+    for(int i = n; i >= 0; i--) {
+        if(num%2 == 0) {
+            resp[i] = '0';
+        } 
+        else {
+            resp[i] = '1';
+        }
+        num=num/2;
+    }
+    num = converte_bin_dec(resp, n);
+    printf("%d", num);
+}
 
-// }
+void converter_dec_hex(int num) {
+    char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    int num_aux = num, n = 0;
+    while (num_aux != 0)
+    {
+        num_aux = num_aux/2;
+        n++;
+    }
+    char resp[n+2];
+    resp[0] = '0';
+    resp[1] = 'x';
+    for (int i = n+1; i >= 2; i--) {
+        for (int j = 0; j < 16; j++) {
+            if(num%16 == j) {
+                resp[i] = hex[j];
+            }
+        }
+        num=num/16;
+    }
+    for(int i = 0; i < n+2; i++) {
+        printf("%c", resp[i]);
+    }   
+}
+
+void converte_int_char(int num, int n) {
+    char str[n];
+    for(int i = 0; i < n; i++) {
+        str[i] = num/potencia(10, n-1-i) + '0';
+        num%=potencia(10, n-1-i);
+    }
+    //write(STDOUT_FD, str, n);
+    imprime(str,n);
+}
 
 int main()
 {
-    char str[20];
+    char str[32];
+    char str_aux[32];
     //int n = read(STDIN_FD, str, 20);
-    int n = 5;
+    int n = 10;
+    int num;
     scanf("%s", str);
+    if(str[0] == '0' && str[1] == 'b') {
+        imprime(str, n);
+        num = converte_bin_dec(str, n);
+        converte_int_char(num, n);
+        converter_dec_hex(num);
+    }
+    else if(str[0] == '0' && str[1] == 'x') {
+        //converte_hex_bin(str, n);
+        converter_hex_dec(str,n);
+        //imprime(str, n);
+    }
 
-    // int num = converte_char_int(str,n);
-    // num += num;
-
-    // for(int i = 1; i <= n; i++) {
-    //     str[i-1] = num/potencia(10, n-i) + '0';
-    //     num = num%potencia(10, n-i);
-
-    // }
-    int num = converte_hex_dec(str,n);
-    printf("%d", num);
     // for(int i = 0; i < n; i++) {
     //     printf("%c", str[i]);
     // }
