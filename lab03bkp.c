@@ -1,53 +1,62 @@
-int read(int __fd, const void *__buf, int __n){
-    int ret_val;
-  __asm__ __volatile__(
-    "mv a0, %1           # file descriptor\n"
-    "mv a1, %2           # buffer \n"
-    "mv a2, %3           # size \n"
-    "li a7, 63           # syscall write code (63) \n"
-    "ecall               # invoke syscall \n"
-    "mv %0, a0           # move return value to ret_val\n"
-    : "=r"(ret_val)  // Output list
-    : "r"(__fd), "r"(__buf), "r"(__n)    // Input list
-    : "a0", "a1", "a2", "a7"
-  );
-  return ret_val;
-}
+#include  <stdio.h>
 
-void write(int __fd, const void *__buf, int __n)
-{
-  __asm__ __volatile__(
-    "mv a0, %0           # file descriptor\n"
-    "mv a1, %1           # buffer \n"
-    "mv a2, %2           # size \n"
-    "li a7, 64           # syscall write (64) \n"
-    "ecall"
-    :   // Output list
-    :"r"(__fd), "r"(__buf), "r"(__n)    // Input list
-    : "a0", "a1", "a2", "a7"
-  );
-}
+// int read(int __fd, const void *__buf, int __n){
+//     int ret_val;
+//   __asm__ __volatile__(
+//     "mv a0, %1           # file descriptor\n"
+//     "mv a1, %2           # buffer \n"
+//     "mv a2, %3           # size \n"
+//     "li a7, 63           # syscall write code (63) \n"
+//     "ecall               # invoke syscall \n"
+//     "mv %0, a0           # move return value to ret_val\n"
+//     : "=r"(ret_val)  // Output list
+//     : "r"(__fd), "r"(__buf), "r"(__n)    // Input list
+//     : "a0", "a1", "a2", "a7"
+//   );
+//   return ret_val;
+// }
 
-void exit(int code)
-{
-  __asm__ __volatile__(
-    "mv a0, %0           # return code\n"
-    "li a7, 93           # syscall exit (64) \n"
-    "ecall"
-    :   // Output list
-    :"r"(code)    // Input list
-    : "a0", "a7"
-  );
-}
+// void write(int __fd, const void *__buf, int __n)
+// {
+//   __asm__ __volatile__(
+//     "mv a0, %0           # file descriptor\n"
+//     "mv a1, %1           # buffer \n"
+//     "mv a2, %2           # size \n"
+//     "li a7, 64           # syscall write (64) \n"
+//     "ecall"
+//     :   // Output list
+//     :"r"(__fd), "r"(__buf), "r"(__n)    // Input list
+//     : "a0", "a1", "a2", "a7"
+//   );
+// }
 
-void _start()
-{
-  int ret_code = main();
-  exit(ret_code);
-}
+// void exit(int code)
+// {
+//   __asm__ __volatile__(
+//     "mv a0, %0           # return code\n"
+//     "li a7, 93           # syscall exit (64) \n"
+//     "ecall"
+//     :   // Output list
+//     :"r"(code)    // Input list
+//     : "a0", "a7"
+//   );
+// }
 
-#define STDIN_FD  0
-#define STDOUT_FD 1
+// void _start()
+// {
+//   int ret_code = main();
+//   exit(ret_code);
+// }
+
+// #define STDIN_FD  0
+// #define STDOUT_FD 1
+
+void imprime(char str[], int n) {
+    for(int i = 0; i < n; i++) {
+        printf("%c", str[i]);
+    }
+    printf("\n");
+}
 
 int potencia(int num_base, int n) {
     int num_pot = 1;
@@ -73,7 +82,7 @@ int converte_dec_bin(int num) {
         num_aux = num_aux/2;
         n++;
     }
-    char resp[n+3];
+    char resp[n+2];
     resp[0] = '0';
     resp[1] = 'b';
     for(int i = n+1; i >= 2; i--) {
@@ -85,11 +94,9 @@ int converte_dec_bin(int num) {
         }
         num=num/2;
     }
-    // for(int i = 0; i < n+2; i++) {
-    //     printf("%c", resp[i]);
-    // }
-    resp[n+2] = '\n';
-    write(STDOUT_FD, resp, n+3);
+    for(int i = 0; i < n+2; i++) {
+        printf("%c", resp[i]);
+    }
     return n;
 }
 
@@ -149,10 +156,10 @@ void converte_dec_bin2(int num) {
     for(int i = 34 - n; i < 34; i++) {
         resp_fim[i] = resp[i - 34 + n];
     }
-    // for(int i = 0; i < 34; i++) {
-    //     printf("%c", resp_fim[i]);
-    // }
-    write(STDOUT_FD, resp_fim, 34);
+    for(int i = 0; i < 34; i++) {
+        printf("%c", resp_fim[i]);
+    }
+
 }
 
 int soma_um_bin(char str[], int n) {
@@ -236,6 +243,7 @@ void converte_hex_bin(char str[], int n) {
             }
         }
     }
+    printf("%d\n", num);
     converte_dec_bin(num);
 }
 
@@ -260,7 +268,7 @@ void converter_dec_hex(int num) {
         num_aux = num_aux/16;
         n++;
     }
-    char resp[n+3];
+    char resp[n+2];
     resp[0] = '0';
     resp[1] = 'x';
     for (int i = n+1; i >= 2; i--) {
@@ -271,12 +279,10 @@ void converter_dec_hex(int num) {
         }
         num=num/16;
     }
-    // for(int i = 0; i < n+2; i++) {
-    //     printf("%c", resp[i]);
-    // }   
-    // printf("\n");
-    resp[n+2] = '\n';
-    write(STDOUT_FD, resp, n+3);
+    for(int i = 0; i < n+2; i++) {
+        printf("%c", resp[i]);
+    }   
+    printf("\n");
 }
 
 void converter_dec_hex2(int num) {
@@ -338,10 +344,9 @@ void converter_dec_hex2(int num) {
     for(i = 10 - n; i < 10; i++) {
         resp_final[i] = resp[i-10+n];
     }
-    // for(i = 0; i < 10; i++) {
-    //     printf("%c", resp_final[i]);
-    // }
-    write(STDOUT_FD, resp_final, 10);
+    for(i = 0; i < 10; i++) {
+        printf("%c", resp_final[i]);
+    }
 }
 
 void converte_int_char(int num) {
@@ -352,20 +357,25 @@ void converte_int_char(int num) {
         n++;
     }
     if(num < 0) {
+        printf("%d\n",num);
+        num = num*(-1);
+        printf("%d\n",num);
         char str[n+1];
         str[0] = '-';
-        for(int i = 1; i < n; i++) {
-            str[i] = num/potencia(10, n-1-i) + '0';
-            num%=potencia(10, n-1-i);
+        for(int i = 1; i <= n; i++) {
+            str[i] = num/potencia(10, n-i) + '0';
+            num%=potencia(10, n-i);
+            printf("%d\n",num);
         }
-        write(STDOUT_FD, str, n+1);    }
+        imprime(str,n+1);
+    }
     else {
         char str[n];
         for(int i = 0; i < n; i++) {
             str[i] = num/potencia(10, n-1-i) + '0';
             num%=potencia(10, n-1-i);
         }
-        write(STDOUT_FD, str, n);
+        imprime(str,n);
     }
 
     //write(STDOUT_FD, str, n);
@@ -504,16 +514,18 @@ void converter_neg_hex_en(int num) {
         str[i] = numdec/potencia(10, n-1-i) + '0';
         numdec%=potencia(10, n-1-i);
     }
-    write(STDOUT_FD, str, n);
+    imprime(str,n);
 }
 
 int main()
 {
     char str[32];
-    int n = read(STDIN_FD, str, 32);
+    //int n = read(STDIN_FD, str, 20);
+    int n = 32;
     int num;
+    scanf("%s", str);
     if(str[0] == '0' && str[1] == 'b') {
-        write(STDOUT_FD, str, n);
+        imprime(str, n);
         num = converte_bin_dec2(str, n);
         converte_int_char(num);
         converter_dec_hex(num);
@@ -522,9 +534,12 @@ int main()
     else if(str[0] == '0' && str[1] == 'x') {
         num = converter_hex_dec(str,n);
         int tam_bin = converte_dec_bin(num);
+        printf("\n");
         num = converte_bin_dec(str, num);
         converte_int_char(num);
-        write(STDOUT_FD, str, n);        
+        printf("%d",num);
+        printf("\n");
+        imprime(str, n);
         converter_hex_hex_en(str,n);
     }
     else if(str[0] == '-') {
@@ -534,18 +549,20 @@ int main()
         }
         num = converte_char_int(str_aux,n-1);
         converte_dec_bin2(num);
-        write(STDOUT_FD, str, n);
+        printf("\n");
+        imprime(str,n);
         converter_dec_hex2(num);
+        printf("\n");
         converter_neg_hex_en(num);
     }
     else {
         num = converte_char_int(str,n);
         converte_dec_bin(num);
-        write(STDOUT_FD, str, n);
+        printf("\n");
+        imprime(str,n);
         converter_dec_hex(num);
         converte_dec_hex_en(num);
     }
-
 
     //write(STDOUT_FD, str, n);
     return 0;
