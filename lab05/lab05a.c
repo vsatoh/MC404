@@ -59,64 +59,182 @@ int potencia(int num_base, int n) {
     return num_pot;
 }
 
-void converte_dec_bin(int num) {
-    int num_aux = num, n_aux;
-    while(num_aux != 0) {
-        num_aux = num_aux/2;
-        n_aux++;
-    }
-    char resp[32];
-    for(int i = 0; i < 4-n_aux; i++) {
-        for(int j = 0; j < 4; j++) {
-            resp[i] = '0';
+int polinomio_bin(char str[], int n) {
+    int num = 0;
+    for(int i = 0; i < n; i++) {
+        if(str[i] == '1') {
+            num += potencia(2,n-1-i);
         }
     }
+    return num;
+}
+
+int converte_dec_bin(int num, int recuo) {
+    int num_aux = num, n;
+    while(num_aux != 0) {
+        num_aux = num_aux/2;
+        n++;
+    }
+
+    char resp[n];
+    for(int i = n-1; i >= 0; i--) {
+        if(num%2 == 0) {
+            resp[i] = '0';
+        } 
+        else {
+            resp[i] = '1';
+        }
+        num=num/2;
+    }
+    
+    char resp_aux[32];
+    for(int i = 0; i < 32 - n; i++) {
+        resp_aux[i] = '0';
+    }    
+
+    for(int i = 32 - n; i < 32; i++) {
+        resp_aux[i] = resp[i - 32 + n];
+    }
+
+    char resp_fim[recuo];
+    for(int i = 32 - recuo; i < 32; i++) {
+        resp_fim[i - 32 + recuo] = resp_aux[i];
+    }
+    for(int i = 0; i < 32; i++) {
+        printf("%c", resp_aux[i]);
+    }
+    printf("\n");
+    int numero_cortado;
+    numero_cortado = polinomio_bin(resp_fim, recuo);
+    return numero_cortado;
+}
+
+int converte_dec_bin2(int num, int recuo) {
+    int n = 0, aux = 0;
+    int num_aux = num;
+    while (num_aux != 0)
+    {
+        num_aux = num_aux/2;
+        n++;
+    }
+
+    char resp[n];
+    for(int i = n-1; i >= 0; i--) {
+        if(num%2 == 0) {
+            resp[i] = '0';
+        } 
+        else {
+            resp[i] = '1';
+        }
+        num=num/2;
+    }
+
+    //sub 1
+    int pos = n-1;
+    while(aux == 0) {
+        if(resp[pos] == '1') {
+            resp[pos] = '0';
+            aux = 1;
+        } else {
+            resp[pos] = '1';
+        }
+        pos--;
+    }
+
+    for(int i = 0; i < n; i++) {
+        if(resp[i] == '1') {
+            resp[i] = '0';
+        }
+        else {
+            resp[i] = '1';
+        }
+    }
+
+    char resp_aux[32];
+    for(int i = 0; i < 32 - n; i++) {
+        resp_aux[i] = '1';
+    }
+    for(int i = 32 - n; i < 32; i++) {
+        resp_aux[i] = resp[i - 32 + n];
+    }
+    char resp_fim[recuo];
+    for(int i = 32 - recuo; i < 32; i++) {
+        resp_fim[i - 32 + recuo] = resp_aux[i];
+    }
+    for(int i = 0; i < 32; i++) {
+        printf("%c", resp_aux[i]);
+    }
+    printf("\n");
+    int numero_cortado;
+    numero_cortado = polinomio_bin(resp_fim, recuo);
+    return numero_cortado;
 }
 
 int converte_char_int(char str[], int n) {
     int numero_final = 0;
     for(int i = 1; i <= n; i++) {
-        numero_final += (str[i-1] - '0')*potencia(10, n-i);
+        if (str[i-1] != '0') {
+            numero_final += (str[i-1] - '0')*potencia(10, n-i);
+        }
     }
     return numero_final;
 }
 
 
-unsigned int converte_dec_bin(int num) {
-    if(num == 0 | num == 1) {
-        return num;
-    }
-    else if(num%2 == 1) {
-        return converte_dec_bin(num/2)*10 + 1; 
-    }
-    return converte_dec_bin(num/2)*10;
-}
+// unsigned int converte_dec_bin(int num) {
+//     if(num == 0 | num == 1) {
+//         return num;
+//     }
+//     else if(num%2 == 1) {
+//         return converte_dec_bin(num/2)*10 + 1; 
+//     }
+//     return converte_dec_bin(num/2)*10;
+// }
 
 
 int main() {
-    // char str[30];
-    // int n = read(STDIN_FD, str, 30);
+    char str[30];
+    //int n = read(STDIN_FD, str, 30);
 
     char masc3[32] = "00000000000000000000000000000111";
     char masc5[32] = "00000000000000000000000000011111";
     char masc8[32] = "00000000000000000000000011111111";
     char masc11[32] = "00000000000000000000011111111111";
-    for(int i = 0; i < 32; i++) {
-        printf("%c", masc3[i]);
+
+
+    int num[5], num_transf[5];
+    int num_sig[5] = {3, 8, 5, 5, 11};
+    char mtrx_str[5][4], sinais[5];
+    scanf("%s", str);
+    for(int i = 0; i < 5; i++) {
+        sinais[i] = str[6*i];
+        for(int j = 1; j < 5; j++) {
+            mtrx_str[i][j-1] = str[6*i + j];
+        }
     }
-    // int num[5];
-    // char mtrx_str[5][6];
 
     // for(int i = 0; i < 5; i++) {
-    //     for(int j = 0; j < 5; j++) {
-    //         mtrx_str[i][j] = str[6*i + j];
+    //     for(int j = 0; j < 4; j++) {
+    //         printf("%c",mtrx_str[i][j]);
     //     }
+    //     printf("\n");
     // }
 
-    // for(int i = 0; i < 5; i++) {
-    //     num[i] = converte_char_int(mtrx_str[i], 5);
-    // }
+    for(int i = 0; i < 5; i++) {
+        num[i] = converte_char_int(mtrx_str[i], 4);
+    }
 
+    for(int i = 0; i < 5; i++) {
+        if(sinais[i] == '+') {
+            num_transf[i] = converte_dec_bin(num[i], num_sig[i]);
+        }
+        else {
+            num_transf[i] = converte_dec_bin2(num[i], num_sig[i]);
+        }
+    }
+    for(int i = 0; i < 5; i++) {
+        printf("%d\n", num_transf[i]);
+    }
     // write(STDOUT_FD, str, 30);
 
 
