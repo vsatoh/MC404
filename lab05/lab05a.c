@@ -224,7 +224,7 @@ void concatena_bin(int num_transf[], int num_sig[]) {
     hex_con[1] = 'x';
     for(int k = 0; k < 8; k++) {
         int num_aux = num_sep[k];
-        char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'B', 'D', 'E', 'E'};
+        char hex[16] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
         for (int j = 0; j < 16; j++) {
             if(num_aux == j) {
                 hex_con[2+k] = hex[j];
