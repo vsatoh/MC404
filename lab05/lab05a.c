@@ -112,16 +112,16 @@ int converte_dec_bin2(int num, int recuo) {
         num_aux = num_aux/2;
         n++;
     }
-
+    num_aux = num;
     char resp[n];
     for(int i = n-1; i >= 0; i--) {
-        if(num%2 == 0) {
+        if(num_aux%2 == 0) {
             resp[i] = '0';
         } 
         else {
             resp[i] = '1';
         }
-        num=num/2;
+        num_aux=num_aux/2;
     }
 
     //sub 1
