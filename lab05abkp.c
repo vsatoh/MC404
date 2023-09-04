@@ -1,53 +1,54 @@
-int read(int __fd, const void *__buf, int __n){
-    int ret_val;
-  __asm__ __volatile__(
-    "mv a0, %1           # file descriptor\n"
-    "mv a1, %2           # buffer \n"
-    "mv a2, %3           # size \n"
-    "li a7, 63           # syscall write code (63) \n"
-    "ecall               # invoke syscall \n"
-    "mv %0, a0           # move return value to ret_val\n"
-    : "=r"(ret_val)  // Output list
-    : "r"(__fd), "r"(__buf), "r"(__n)    // Input list
-    : "a0", "a1", "a2", "a7"
-  );
-  return ret_val;
-}
+#include <stdio.h>
+// int read(int __fd, const void *__buf, int __n){
+//     int ret_val;
+//   __asm__ __volatile__(
+//     "mv a0, %1           # file descriptor\n"
+//     "mv a1, %2           # buffer \n"
+//     "mv a2, %3           # size \n"
+//     "li a7, 63           # syscall write code (63) \n"
+//     "ecall               # invoke syscall \n"
+//     "mv %0, a0           # move return value to ret_val\n"
+//     : "=r"(ret_val)  // Output list
+//     : "r"(__fd), "r"(__buf), "r"(__n)    // Input list
+//     : "a0", "a1", "a2", "a7"
+//   );
+//   return ret_val;
+// }
 
-void write(int __fd, const void *__buf, int __n)
-{
-  __asm__ __volatile__(
-    "mv a0, %0           # file descriptor\n"
-    "mv a1, %1           # buffer \n"
-    "mv a2, %2           # size \n"
-    "li a7, 64           # syscall write (64) \n"
-    "ecall"
-    :   // Output list
-    :"r"(__fd), "r"(__buf), "r"(__n)    // Input list
-    : "a0", "a1", "a2", "a7"
-  );
-}
+// void write(int __fd, const void *__buf, int __n)
+// {
+//   __asm__ __volatile__(
+//     "mv a0, %0           # file descriptor\n"
+//     "mv a1, %1           # buffer \n"
+//     "mv a2, %2           # size \n"
+//     "li a7, 64           # syscall write (64) \n"
+//     "ecall"
+//     :   // Output list
+//     :"r"(__fd), "r"(__buf), "r"(__n)    // Input list
+//     : "a0", "a1", "a2", "a7"
+//   );
+// }
 
-void exit(int code)
-{
-  __asm__ __volatile__(
-    "mv a0, %0           # return code\n"
-    "li a7, 93           # syscall exit (64) \n"
-    "ecall"
-    :   // Output list
-    :"r"(code)    // Input list
-    : "a0", "a7"
-  );
-}
+// void exit(int code)
+// {
+//   __asm__ __volatile__(
+//     "mv a0, %0           # return code\n"
+//     "li a7, 93           # syscall exit (64) \n"
+//     "ecall"
+//     :   // Output list
+//     :"r"(code)    // Input list
+//     : "a0", "a7"
+//   );
+// }
 
-void _start()
-{
-  int ret_code = main();
-  exit(ret_code);
-}
+// void _start()
+// {
+//   int ret_code = main();
+//   exit(ret_code);
+// }
 
-#define STDIN_FD  0
-#define STDOUT_FD 1
+// #define STDIN_FD  0
+// #define STDOUT_FD 1
 
 int potencia(int num_base, int n) {
     int num_pot = 1;
@@ -68,23 +69,23 @@ int polinomio_bin(char str[], int n) {
 }
 
 int converte_dec_bin(int num, int recuo) {
-    int num_aux = num, n = 0;
+    int num_aux = num, n=0;
     while(num_aux != 0) {
         num_aux = num_aux/2;
         n++;
     }
-
+    num_aux = num;
     char resp[n];
     for(int i = n-1; i >= 0; i--) {
-        if(num%2 == 0) {
+        if(num_aux%2 == 0) {
             resp[i] = '0';
         } 
         else {
             resp[i] = '1';
         }
-        num=num/2;
+        num_aux=num_aux/2;
     }
-    
+
     char resp_aux[32];
     for(int i = 0; i < 32 - n; i++) {
         resp_aux[i] = '0';
@@ -168,6 +169,7 @@ int converte_char_int(char str[], int n) {
             numero_final += (str[i-1] - '0')*potencia(10, n-i);
         }
     }
+    //printf("%d\n", numero_final);
     return numero_final;
 }
 
@@ -232,7 +234,9 @@ void concatena_bin(int num_transf[], int num_sig[]) {
         }
     }
     hex_con[10] = '\n';
-    write(STDOUT_FD, hex_con, 11);
+    for(int i = 0; i < 11; i++) {
+        printf("%c", hex_con[i]);
+    }
 }
 
 // unsigned int converte_dec_bin(int num) {
@@ -248,14 +252,14 @@ void concatena_bin(int num_transf[], int num_sig[]) {
 
 int main() {
     char str[30];
-    int n = read(STDIN_FD, str, 30);
+    //int n = read(STDIN_FD, str, 30);
 
     char masc3[32] = "00000000000000000000000000000111";
     char masc5[32] = "00000000000000000000000000011111";
     char masc8[32] = "00000000000000000000000011111111";
     char masc11[32] = "00000000000000000000011111111111";
 
-
+    scanf("%s", str);
     int num[5], num_transf[5];
     int num_sig[5] = {3, 8, 5, 5, 11};
     char mtrx_str[5][4], sinais[5];
