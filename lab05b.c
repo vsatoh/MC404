@@ -1,4 +1,4 @@
-//#include <stdio.h>
+#include <stdio.h>
 
 typedef enum InstType { R, I, S, B, U, J} InstType;
 
@@ -14,46 +14,46 @@ typedef struct InstData {
 } InstData;
 
 
-int read(int __fd, const void *__buf, int __n){
-  int bytes;
-  __asm__ __volatile__(
-    "mv a0, %1           # file descriptor\n"
-    "mv a1, %2           # buffer \n"
-    "mv a2, %3           # size \n"
-    "li a7, 63           # syscall read (63) \n"
-    "ecall \n"
-    "mv %0, a0"
-    : "=r"(bytes)  // Output list
-    :"r"(__fd), "r"(__buf), "r"(__n)    // Input list
-    : "a0", "a1", "a2", "a7"
-  );
-  return bytes;
-}
+// int read(int __fd, const void *__buf, int __n){
+//   int bytes;
+//   __asm__ __volatile__(
+//     "mv a0, %1           # file descriptor\n"
+//     "mv a1, %2           # buffer \n"
+//     "mv a2, %3           # size \n"
+//     "li a7, 63           # syscall read (63) \n"
+//     "ecall \n"
+//     "mv %0, a0"
+//     : "=r"(bytes)  // Output list
+//     :"r"(__fd), "r"(__buf), "r"(__n)    // Input list
+//     : "a0", "a1", "a2", "a7"
+//   );
+//   return bytes;
+// }
 
-void write(int __fd, const void *__buf, int __n){
-  __asm__ __volatile__(
-    "mv a0, %0           # file descriptor\n"
-    "mv a1, %1           # buffer \n"
-    "mv a2, %2           # size \n" 
-    "li a7, 64           # syscall write (64) \n"
-    "ecall"
-    :   // Output list
-    :"r"(__fd), "r"(__buf), "r"(__n)    // Input list
-    : "a0", "a1", "a2", "a7"
-  );
-}
+// void write(int __fd, const void *__buf, int __n){
+//   __asm__ __volatile__(
+//     "mv a0, %0           # file descriptor\n"
+//     "mv a1, %1           # buffer \n"
+//     "mv a2, %2           # size \n" 
+//     "li a7, 64           # syscall write (64) \n"
+//     "ecall"
+//     :   // Output list
+//     :"r"(__fd), "r"(__buf), "r"(__n)    // Input list
+//     : "a0", "a1", "a2", "a7"
+//   );
+// }
 
-void exit(int code)
-{
-  __asm__ __volatile__(
-    "mv a0, %0           # return code\n"
-    "li a7, 93           # syscall exit (64) \n"
-    "ecall"
-    :             // Output list
-    :"r"(code)    // Input list
-    : "a0", "a7"
-  );
-}
+// void exit(int code)
+// {
+//   __asm__ __volatile__(
+//     "mv a0, %0           # return code\n"
+//     "li a7, 93           # syscall exit (64) \n"
+//     "ecall"
+//     :             // Output list
+//     :"r"(code)    // Input list
+//     : "a0", "a7"
+//   );
+// }
 
 int potencia(int num_base, int n) {
     int num_pot = 1;
@@ -212,10 +212,10 @@ void hex_code(int val){
             hex[i] = aux + '0';
         uval = uval / 16;
     }
-    // for(int i = 0; i < 10; i++) {
-    //     printf("%c", hex[i]);
-    // }
-    write(1, hex, 11);
+    for(int i = 0; i < 10; i++) {
+        printf("%c", hex[i]);
+    }
+    //write(1, hex, 11);
 }
 
 int monta_bin_I(int num, int strt, int end, int aux) {
@@ -286,7 +286,7 @@ void enpacota_num(InstData data) {
         hex_code(num_final);
     } else if(data.type == 3) { // ok
         num_final += monta_bin_I(data.opcode, 6, 0, 0);
-        int imm_cortado = pega_imm(data.imm, 4, 1, 11);
+        int imm_cortado = pega_imm1(data.imm, 4, 1, 11);
         num_final += monta_bin_I(imm_cortado, 11, 7, 1);
         num_final += monta_bin_I(data.funct3, 14, 12, 0);
         num_final += monta_bin_I(data.rs1, 19, 15, 0);
@@ -294,20 +294,7 @@ void enpacota_num(InstData data) {
         imm_cortado = pega_imm2(data.imm, 12, 10, 5);
         num_final += monta_bin_I(imm_cortado, 31, 25, 0);
         hex_code(num_final);
-    } else if(data.type == 4) {
-
-    } else if(data.type == 5) {
-        num_final += monta_bin_I(data.opcode, 6, 0, 0);
-        num_final += monta_bin_I(data.rd, 11, 7, 0);
-        int imm_cortado = pega_imm(data.imm, 19, 12);
-        num_final += monta_bin_I(imm_cortado, 19, 12, 0);
-        imm_cortado = pega_imm(data.imm, 11, 11);
-        num_final += monta_bin_I(imm_cortado, 20, 20, 0);
-        imm_cortado = pega_imm(data.imm, 10, 1);
-        num_final += monta_bin_I(imm_cortado, 30, 21, 0);
-        imm_cortado = pega_imm(data.imm, 20, 20);
-        num_final += monta_bin_I(imm_cortado, 31,31, 0);
-    }
+    } 
 }
 
 int strcmp_custom(char *str1, char *str2, int n_char){
@@ -464,7 +451,7 @@ void get_inst_data(char inst[], InstData *data){
         // OPCODE = 0000011 = 3 FUNCT3 = 5
         r1_imm_r2(inst, &rd, &rs1, &imm, 3);
         opcode = 3, funct3 = 5;
-    } else if (strcmp_custom(inst, "sb ", 3) == 0){
+    } else if (strcmp_custom(inst, "sba", 3) == 0){
         // sb rs2, IMM(rs1)
         // OPCODE = 0100011 = 35 FUNCT3 = 0
         r1_imm_r2(inst, &rs2, &rs1, &imm, 2);
@@ -590,8 +577,8 @@ int main()
 {
     InstData data;
     char entrada[40];
-    //scanf("%s", entrada);
-    int n = read(0, entrada, 40);
+    scanf("%s", entrada);
+    //int n = read(0, entrada, 40);
     get_inst_data(entrada, &data);
     // printf("%d\n", data.opcode);
     // printf("%d\n", data.rd);
@@ -606,7 +593,7 @@ int main()
     return 0;
 }
 
-void _start(){
-    int ret_code = main();
-    exit(ret_code);
-}
+// void _start(){
+//     int ret_code = main();
+//     exit(ret_code);
+// }
