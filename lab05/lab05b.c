@@ -286,7 +286,7 @@ void enpacota_num(InstData data) {
         hex_code(num_final);
     } else if(data.type == 3) { // ok
         num_final += monta_bin_I(data.opcode, 6, 0, 0);
-        int imm_cortado = pega_imm(data.imm, 4, 1, 11);
+        int imm_cortado = pega_imm1(data.imm, 4, 1, 11);
         num_final += monta_bin_I(imm_cortado, 11, 7, 1);
         num_final += monta_bin_I(data.funct3, 14, 12, 0);
         num_final += monta_bin_I(data.rs1, 19, 15, 0);
