@@ -63,139 +63,6 @@ int potencia(int num_base, int n) {
     return num_pot;
 }
 
-int polinomio_bin(char str[], int ini, int fim) {
-    int num = 0;
-    for(int i = ini; i <= fim; i++) {
-        if(str[i-ini] == '1') {
-            num += potencia(2,fim-i+ini);
-        }
-    }
-    return num;
-} 
-
-int pega_imm(int imm, int ini, int fim) {
-    int num_aux = imm, n = 0;
-    while(num_aux != 0) {
-        num_aux = num_aux/2;
-        n++;
-    }
-
-    num_aux = imm;
-    char resp[n];
-    for(int i = n-1; i >= 0; i--) {
-        if(num_aux%2 == 0) {
-            resp[i] = '0';
-        } 
-        else {
-            resp[i] = '1';
-        }
-        num_aux=num_aux/2;
-    }
-    
-    char resp_aux[32];
-    for(int i = 0; i < 32 - n; i++) {
-        resp_aux[i] = '0';
-    }    
-
-    for(int i = 32 - n; i < 32; i++) {
-        resp_aux[i] = resp[i - 32 + n];
-    }
-    int tam_aux = ini-fim+1;
-    char resp_fim1[tam_aux];
-    for(int i = 32-ini; i <= 32-fim; i++) {
-        resp_fim1[i-32+ini] = resp_aux[i];
-    }
-    int num_f = polinomio_bin(resp_fim1, 0, ini-fim-1);
-    return num_f;
-}
-
-int pega_imm1(int imm, int ini, int fim, int ap) {
-    int num_aux = imm, n = 0;
-    while(num_aux != 0) {
-        num_aux = num_aux/2;
-        n++;
-    }
-
-    num_aux = imm;
-    char resp[n];
-    for(int i = n-1; i >= 0; i--) {
-        if(num_aux%2 == 0) {
-            resp[i] = '0';
-        } 
-        else {
-            resp[i] = '1';
-        }
-        num_aux=num_aux/2;
-    }
-    
-    char resp_aux[32];
-    for(int i = 0; i < 32 - n; i++) {
-        resp_aux[i] = '0';
-    }    
-
-    for(int i = 32 - n; i < 32; i++) {
-        resp_aux[i] = resp[i - 32 + n];
-    }
-    int tam_aux = ini-fim+2;
-    char resp_fim1[tam_aux];
-    for(int i = fim; i <= ini; i++) {
-        resp_fim1[i-fim] = resp_aux[i];
-    }
-    resp_fim1[ini-fim+1] = resp_aux[ap];
-    // for(int i = 0; i < tam_aux; i++) {
-    //     printf("%c",resp_fim1[i]);
-    // }
-    // printf("\n");
-    int num_f = polinomio_bin(resp_fim1, 0, ini-fim+1);
-    return num_f;
-}
-
-int pega_imm2(int imm,int ap, int ini, int fim) {
-    int num_aux = imm, n = 0;
-    while(num_aux != 0) {
-        num_aux = num_aux/2;
-        n++;
-    }
-
-    num_aux = imm;
-    char resp[n];
-    for(int i = n-1; i >= 0; i--) {
-        if(num_aux%2 == 0) {
-            resp[i] = '0';
-        } 
-        else {
-            resp[i] = '1';
-        }
-        num_aux=num_aux/2;
-    }
-    
-    char resp_aux[32];
-    for(int i = 0; i < 32 - n; i++) {
-        resp_aux[i] = '0';
-    }    
-
-    for(int i = 32 - n; i < 32; i++) {
-        resp_aux[i] = resp[i - 32 + n];
-    }
-    // for(int i = 0; i < 32; i++) {
-    //     printf("%c", resp_aux[i]);
-    // }
-    //     printf("\n");
-
-    int tam_aux = ini-fim+2;
-    char resp_fim1[tam_aux];
-    for(int i = ini; i >= fim; i--) { //correcao do 32
-        resp_fim1[1+ini-i] = resp_aux[31-i];
-    }
-    resp_fim1[0] = resp_aux[ap];
-    // for(int i = 0; i < tam_aux; i++) {
-    //     printf("%c",resp_fim1[i]);
-    // }
-    // printf("\n");
-    int num_f = polinomio_bin(resp_fim1, 0, ini-fim+1);
-    return num_f;
-}
-
 void hex_code(int val){
     char hex[11];
     unsigned int uval = (unsigned int) val, aux;
@@ -218,174 +85,52 @@ void hex_code(int val){
     write(1, hex, 11);
 }
 
-int monta_bin_I(int num, int strt, int end, int aux) {
-    int num_aux = num, n = 0;
-    while(num_aux != 0) {
-        num_aux = num_aux/2;
-        n++;
-    }
-    char resp[n];
-    for(int i = n-1; i >= 0; i--) {
-        if(num%2 == 0) {
-            resp[i] = '0';
-        } 
-        else {
-            resp[i] = '1';
-        }
-        num=num/2;
-    }
-
-    int n_aux = strt - end + 1;
-    int num_cort = 0;
-
-    char resp_aux[n_aux];
-    for(int i = 0; i < n_aux - n; i++) {
-        resp_aux[i] = '0';
-    }    
-
-    for(int i = n_aux - n; i < n_aux; i++) {
-        resp_aux[i] = resp[i - n_aux + n];
-    }
-    if(aux == 1) {
-        num_cort = polinomio_bin(resp_aux, 0, strt-end);
-    }
-    else {
-        num_cort = polinomio_bin(resp_aux, end, strt);
-    }
-
-    return num_cort;
-}
-
-int monta_bin_2(int num, int strt, int end) {
-    int n = 0, aux = 0;
-    int num_aux = num;
-    while (num_aux != 0)
-    {
-        num_aux = num_aux/2;
-        n++;
-    }
-    num_aux = num;
-    char resp[n];
-    for(int i = n-1; i >= 0; i--) {
-        if(num_aux%2 == 0) {
-            resp[i] = '0';
-        } 
-        else {
-            resp[i] = '1';
-        }
-        num_aux=num_aux/2;
-    }
-
-    //sub 1
-    int pos = n-1;
-    while(aux == 0) {
-        if(resp[pos] == '1') {
-            resp[pos] = '0';
-            aux = 1;
-        } else {
-            resp[pos] = '1';
-        }
-        pos--;
-    }
-
-    for(int i = 0; i < n; i++) {
-        if(resp[i] == '1') {
-            resp[i] = '0';
-        }
-        else {
-            resp[i] = '1';
-        }
-    }
-
-    char resp_aux[32];
-    for(int i = 0; i < 32 - n; i++) {
-        resp_aux[i] = '1';
-    }
-    for(int i = 32 - n; i < 32; i++) {
-        resp_aux[i] = resp[i - 32 + n];
-    }
-    int numero_cortado;
-    numero_cortado = polinomio_bin(resp_aux, 0, strt-end);
-    return numero_cortado;
+void pack(int num, int strt, int end, int *valor) {
+    int tam = (end - strt) + 1;
+    int mascara = (potencia(2, tam)) - 1;
+    mascara = (num & mascara) << strt;
+    *valor = *valor | mascara;
 }
 
 void enpacota_num(InstData data) {
     int num_final = 0;
+    num_final = num_final | data.opcode;
     if(data.type == 0) { //ok
-        num_final += monta_bin_I(data.opcode, 6, 0, 0);
-        num_final += monta_bin_I(data.rd, 11, 7, 0);
-        num_final += monta_bin_I(data.funct3, 14, 12, 0);
-        num_final += monta_bin_I(data.rs1, 19, 15, 0);
-        num_final += monta_bin_I(data.rs2,24,20, 0);
-        num_final += monta_bin_I(data.funct7, 31, 25, 0);
-        hex_code(num_final);
+        pack(data.rd, 7, 11, &num_final);
+        pack(data.funct3, 12, 14, &num_final);
+        pack(data.rs1, 15, 19, &num_final);
+        pack(data.rs2,20,24, &num_final);
+        pack(data.funct7, 25, 31, &num_final);
     } else if(data.type == 1) { // ok
-        num_final += monta_bin_I(data.opcode, 6, 0, 0);
-        num_final += monta_bin_I(data.rd, 11, 7, 0);
-        num_final += monta_bin_I(data.funct3, 14, 12, 0);
-        num_final += monta_bin_I(data.rs1, 19, 15, 0);
-        int imm_cortado;
-        if(data.imm >= 0) {
-            imm_cortado = pega_imm(data.imm, 11, 0);
-        }
-        else {
-            imm_cortado = monta_bin_2(data.imm, 11, 0);
-        }
-
-        num_final += monta_bin_I(imm_cortado, 31, 20, 0);
-        hex_code(num_final);
+        pack(data.rd, 7, 11, &num_final);
+        pack(data.funct3, 12, 14, &num_final);
+        pack(data.rs1, 15, 19, &num_final);
+        pack(data.imm,20,31, &num_final);
     } else if(data.type == 2) {
-        num_final += monta_bin_I(data.opcode, 6, 0, 0);
-        int imm_cortado;
-        if(data.imm >= 0) {
-            imm_cortado = pega_imm(data.imm, 4, 0);
-        }
-        else {
-            imm_cortado = monta_bin_2(data.imm, 4, 0);
-        }
-        num_final += monta_bin_I(imm_cortado, 11, 7, 0);
-        num_final += monta_bin_I(data.funct3, 14, 12, 0);
-        num_final += monta_bin_I(data.rs1, 19, 15, 0);
-        num_final += monta_bin_I(data.rs2,24,20, 0);
-        if(data.imm >= 0) {
-            imm_cortado = pega_imm(data.imm, 11,5);
-        }
-        else {
-            imm_cortado = monta_bin_2(data.imm, 11,5);
-        }
-        num_final += monta_bin_I(imm_cortado, 31, 25, 0);
-        hex_code(num_final);
+        pack(data.imm, 7, 11, &num_final);
+        pack(data.funct3, 12, 14, &num_final);
+        pack(data.rs1, 15, 19, &num_final);
+        pack(data.rs2,20,24, &num_final);
+        pack(data.imm >> 5,25,31, &num_final);
     } else if(data.type == 3) { // ok
-        num_final += monta_bin_I(data.opcode, 6, 0, 0);
-        int imm_cortado = pega_imm1(data.imm, 4, 1, 11);
-        num_final += monta_bin_I(imm_cortado, 11, 7, 1);
-        num_final += monta_bin_I(data.funct3, 14, 12, 0);
-        num_final += monta_bin_I(data.rs1, 19, 15, 0);
-        num_final += monta_bin_I(data.rs2,24,20, 0);
-        imm_cortado = pega_imm2(data.imm, 12, 10, 5);
-        num_final += monta_bin_I(imm_cortado, 31, 25, 0);
-        hex_code(num_final);
+        pack(data.imm >> 11, 7, 7, &num_final);
+        pack(data.imm >> 1, 8, 11, &num_final);
+        pack(data.funct3, 12, 14, &num_final);
+        pack(data.rs1, 15, 19, &num_final);
+        pack(data.rs2, 20, 24, &num_final);
+        pack(data.imm >> 5, 25, 30, &num_final);
+        pack(data.imm >> 12, 31, 31, &num_final);
     } else if(data.type == 4) {
-
+        pack(data.rd,7, 11, &num_final);
+        pack(data.imm, 12, 31, &num_final);
     } else if(data.type == 5) {
-        num_final += monta_bin_I(data.opcode, 6, 0, 0);
-        num_final += monta_bin_I(data.rd, 11, 7, 0);
-        int imm_cortado;
-        if(data.imm >= 0) {
-            imm_cortado = pega_imm(data.imm, 19, 12);
-        }
-        else {
-            imm_cortado = monta_bin_2(data.imm, 19, 12);
-        }
-        num_final += monta_bin_I(imm_cortado, 19, 12, 0);
-        num_final += monta_bin_I(imm_cortado, 31, 20, 0);
-        imm_cortado = pega_imm(data.imm, 11, 11);
-        num_final += monta_bin_I(imm_cortado, 20, 20, 0);
-        imm_cortado = pega_imm(data.imm, 10, 1);
-        num_final += monta_bin_I(imm_cortado, 30, 21, 0);
-        imm_cortado = pega_imm(data.imm, 20, 20);
-        num_final += monta_bin_I(imm_cortado, 31,31, 0);
+        pack(data.rd, 7, 11, &num_final);
+        pack(data.imm >> 12, 12, 19, &num_final);
+        pack(data.imm >> 11, 20, 20, &num_final);
+        pack(data.imm >> 1, 21, 30, &num_final);
+        pack(data.imm >> 20, 31, 31, &num_final);
     }
+    hex_code(num_final);
 }
 
 int strcmp_custom(char *str1, char *str2, int n_char){
@@ -678,7 +423,6 @@ int main()
     // printf("%d\n", data.rs2);
     // printf("%d\n", data.funct7);
     //printf("%d\n", data.imm);
-
 
     enpacota_num(data);
     return 0;
