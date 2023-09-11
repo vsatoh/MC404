@@ -6,3 +6,4 @@ lab03.o: lab03.s
 
 lab03.x: lab03.o
 	ld.lld lab03.o -o lab03.x
+

@@ -14,3 +14,22 @@ write:
     li a7, 64           // syscall write (64)
     ecall    
 string:  .asciz "Hello! It works!!!\n"
+
+.globl _start
+
+_start:
+  li a0, 260711  #<<<=== Academic Record number (RA)
+  li a1, 0
+  li a2, 0
+  li a3, -1
+
+    divui a3, a1, 2
+    li a4, 0
+
+babylo_method:
+    divu  a5, a1, a3
+    addu a3, a3, a5
+    divui a3, a3, 2
+    addi a4, a4, 1
+    blti a4, 10, babylo_method
+

@@ -1,5 +1,10 @@
-/* Programa que retorna a resposta para a Grande Pergunta sobre a 
- * Vida, o Universo e Tudo o Mais */
-int main(void) {
-  return 42;
+int main() {
+    int y = 400;
+    int k;
+    k = y/2;
+    for(int i = 0; i < 10; i++) {
+        k = (k+y/k)/2;
+        printf("Valor de k: %d\n",k);
+    }
+    return 0;
 }
