@@ -1,6 +1,6 @@
 read:
     li a0, 0  // file descriptor = 0 (stdin)
-    la a1, input_address //  buffer to write the data
+    la a1, input_address //  buffer to write the data carregar em outro lugar
     li a2, 1  // size (reads only 1 byte)
     li a7, 63 // syscall read (63)
     ecall
@@ -16,35 +16,53 @@ write:
 string:  .asciz "Hello! It works!!!\n"
 
 sqrt:
-    divu  a5, a1, a3
-    addu a3, a3, a5
-    divui a3, a3, 2
+    divu  a5, soma, a3
+    add a3, a3, a5
+    divi a3, a3, 2
     addi a4, a4, 1
     blti a4, 10, sqrt
 
 pow:
-    mul res_pow, res_pow, 10
-    addi aux, aux, 1
-    blt aux, lim, pow 
+    mul a3, a3, 10
+    addi aux2, aux2, 1
+    blt aux2, lim, pow 
 
 trans_int:
-    li lim, 4
-    
+    subi aux, 1
+    lb a3, 0(a6)
+    subi a3, a3, 48
+    li aux2, 0
+    jal ra, pow
+    add a6, a6, 1
+    add soma, soma, a3
+    bge aux, 0, trans_int
+
+oper:
+    lw a6, 0(a1)
+    jal t0, trans_int
+    divu a3, soma, 2
+    jal t0, sqrt
 
 .globl _start
 
 _start:
 
-    li a0, 0  // file descriptor = 0 (stdin)
-    la a1, input_address //  buffer to write the data
-    li a2, 1  // size (reads only 1 byte)
-    li a7, 63 // syscall read (63)
-    ecall
+    jal t1, read
 
-    divui a3, a1, 2
-    li a4, 0
+    lw a6, 0(a1)
+    jal t1, oper
+    add a1, a1, 5
+
+    lw a6, 0(a1)
+    jal t1, oper
+    add a1, a1, 5
+
+    lw a6, 0(a1)
+    jal t1, oper
+    add a1, a1, 5
+    lw a6, 0(a1)
 
 section .data
-    aux DW 1
-    lim DW 0
-    res_pow DW 1
+    aux .skip 0x4
+    aux2 .skip 0x4
+    soma .skip 0x4
