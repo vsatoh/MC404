@@ -329,7 +329,8 @@ void converte_int_char(int num) {
             str[i] = num/potencia(10, n-1-i) + '0';
             num%=potencia(10, n-1-i);
         }
-        write(STDOUT_FD, str, n+1);    }
+        write(STDOUT_FD, str, n+1);
+    }
     else {
         char str[n];
         for(int i = 0; i < n; i++) {
@@ -338,7 +339,6 @@ void converte_int_char(int num) {
         }
         write(STDOUT_FD, str, n);
     }
-
     //write(STDOUT_FD, str, n);
 }
 
