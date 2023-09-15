@@ -24,3 +24,29 @@ sb x19, 736(x7)
 bltu x28, x20, 2920
 
 0x374e64e3
+
+    jal t1, oper
+    addi a1, a1, 5
+    jal t1, int_char
+    li t2, ' '
+    sb t2, 4(a2)
+    addi a2, a2, 5
+
+    jal t1, oper
+    addi a1, a1, 5
+    jal t1, int_char
+    li t2, ' '
+    sb t2, 4(a2)
+    addi a2, a2, 5
+
+    jal t1, oper
+    addi a1, a1, 5
+    jal t1, int_char
+    li t2, ' '
+    sb t2, 4(a2)
+    addi a2, a2, 5
+
+    jal t1, oper
+    addi a1, a1, 4
+    jal t1, int_char
+    sb a1, 4(a2)
