@@ -57,8 +57,8 @@ read_size2:
     ret
 
 setPixel:
-    mv a0, t0
-    mv a1, t1
+    mv a0, t1
+    mv a1, t0
     mv a2, t2
     li a7, 2200 # syscall setPixel (2200)
     ecall
@@ -76,10 +76,10 @@ printImg:
     mv s3, ra #armazena o valor de ra 
     li t0, 0
     for1:
-        bge t0, s0, cont1
+        bge t0, s1, cont1
         li t1, 0
         for2:
-            bge t1, s1, cont2
+            bge t1, s0, cont2
             lbu t2, 0(a3) 
             mv t6, t2
 
