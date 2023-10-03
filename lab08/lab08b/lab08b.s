@@ -74,31 +74,41 @@ setCanvasSize:
 
 printImg:
     mv s3, ra #armazena o valor de ra 
-    li t0, 1
-    addi s1, s1, -1
-    addi s0, s0, -1
+    li t0, 0
+
     for1:
         bge t0, s1, cont1
-        li t1, 1
+        li t1, 0
         for2:
             bge t1, s0, cont2
+            #t1 = 0 ou t0 = 0 ou t1 = s0-1 ou t0 = s1-1
+            li a7, 0
+            beq a7, t0, else
+            beq a7, t1, else
 
-            lbu t2, 0(a3) 
-            #t3, ele anterior
-            #t4, ele posterior
+            mv a7, s0
+            addi a7, a7, -1
+            beq a7, t1, else
 
-            add a3, a3, 
+            mv a7, s1
+            addi a7, a7, -1
+            beq a7, t0, else
 
-            li t5, 8
-            mul t2, t2, 8
+            jal ra, setFilter
+            mv t6, t2
 
             slli t2, t2, 8
-            add t2,t2, t6 
+            add t2, t2, t6
             slli t2, t2, 8
             add t2,t2, t6
             slli t2, t2, 8
             addi t2, t2, 255
+            j cont3
 
+            else: 
+                li t2, 0x000000ff
+
+            cont3:
             jal ra, setPixel
             addi t1, t1, 1
             addi a3, a3, 1
@@ -110,59 +120,67 @@ printImg:
     mv ra, s3
     ret
 
-
-
 setFilter:
-    mv s3, ra
+    li t5, 8
+    li t2, 0
     li t3, -1
-    mul s0, s0, t3
-    
+    sub a3, a3, s0
+
+    lbu t4, 0(a3)
+    mul t4, t4, t3
+    add t2, t2, t4
+    lbu t4, -1(a3)
+    mul t4, t4, t3
+    add t2, t2, t4
+    lbu t4, 1(a3)
+    mul t4, t4, t3
+    add t2, t2, t4
+    add a3, a3, s0
+
+    lbu t4, 0(a3)
+    mul t4, t4, t5
+    add t2, t2, t4
+    lbu t4, -1(a3)
+    mul t4, t4, t3
+    add t2, t2, t4
+    lbu t4, 1(a3)
+    mul t4, t4, t3
+    add t2, t2, t4
+    add a3, a3, s0
 
 
-setEdge:
-    li t2, 0x000000ff
-    li t0, 0
-    li t1, 0
-    for_setE1:
-        bge t1, s0, fim_setB1
-        jal ra, setPixel
-        addi t1, t1, 1
-        j for_setB1
-    fim_setE1:
+    lbu t4, 0(a3)
+    mul t4, t4, t3
+    add t2, t2, t4
+    lbu t4, -1(a3)
+    mul t4, t4, t3
+    add t2, t2, t4
+    lbu t4, 1(a3)
+    mul t4, t4, t3
+    add t2, t2, t4
+    sub a3, a3, s0
 
-    mv t0, s1
-    li t1, 0
-    for_setE2:
-        bge t1, s0, fim_setB1
-        jal ra, setPixel
-        addi t1, t1, 1
-        j for_setB2
-    fim_setE2:
+    li t4, 0
+    blt t2, t4, menor_que_zero
 
-    li t0, 0
-    li t1, 0
-    for_setE3:
-        bge t0, s1, fim_setB1
-        jal ra, setPixel
-        addi t0, t0, 1
-        j for_setB3
-    fim_setE3:
+    li t4, 255
+    blt t4, t2, maior_que_ff
+    j fim_set
 
-    li t0, 0
-    mv t1, s0
-    for_setE4:
-        bge t0, s1, fim_setB1
-        jal ra, setPixel
-        addi t0, t0, 1
-        j for_setB4
-    fim_setE4:
+    menor_que_zero:
+        li t2, 0x0
+        j fim_set
 
+    maior_que_ff:
+        li t2, 0xff
+        j fim_set
+
+    fim_set:
     ret
 
 _start:
     jal ra, open
     jal ra, read
-    #jal ra, write ate aqui funciona
 
     la a3, input_address
     addi a3, a3, 3
@@ -173,7 +191,6 @@ _start:
 
 
     jal ra, setCanvasSize
-
 
     addi a3, a3, 4
     jal ra, printImg
