@@ -32,41 +32,104 @@ converte_int:
         add a5, a3, a5
         addi a1, a1, 1
         lb a3, 0(a1)
+        li a4, '\n'
         j for1
+
     num_neg:
         addi a1, a1, 1
         li a4, '\n'
+        lb a3, 0(a1)
         for2:
-            beq a3, a4, fim
+            beq a3, a4, fim2
             li a4, 10
             mul a5, a5, a4
             addi a3, a3, -48
             add a5, a3, a5
             addi a1, a1, 1
             lb a3, 0(a1)
+            li a4, '\n'
             j for2
+        fim2:
         li a4, -1
         mul a5, a5, a4
     fim:
+    ret
+    
+num_digit:
+    mv t2, t1
+    li t3, 0 #num de digitos
+    li t4, 10
+    for_num_digit:
+        addi t3, t3, 1
+        blt t2, t4, fim_for_num_digit
+        rem t2, t2, t4
+        j for_num_digit
+    fim_for_num_digit:
+    ret    
+
+pow:
+    li t4, 10
+    li t5, 1
+    li t6, 1
+    for_pow:
+        beq t6, t3, fim_pow
+        mul t5, t5, t4
+        addi t6,t6, 1
+        j for_pow
+    fim_pow:
+    ret
+
+int_char:
+    mv s0, ra
+
+    la a1, output_address
+    li t2, -1
+    beq t1, t2, imp_neg
+    li t2, 0
+    for_int_char:
+        beq t2, t3, fim_for_int_char
+        jal ra, pow
+        div a2, t1, t5 #digito
+        rem t1, t1, t5
+        addi a2, a2, 48
+        sb a2, 0(a1)
+        addi a1, a1, 1
+        addi t3, t3, -1
+        j for_int_char
+    fim_for_int_char:
+    li t2, '\n'
+    sb t2, 0(a1)
+    j fim_int_char
+    imp_neg:
+        li t2, '-'
+        sb t2, 0(a1)
+        li t2, '1'
+        sb t2, 1(a1)
+        li t2, '\n'
+        sb t2, 2(a1)
+    fim_int_char:
+    
+    mv ra, s0
     ret
 
 compara:
     la a3, head_node
     li t1, -1
     li t2, 0 #contador
+    lw s0, 0(a3)
     for_comp:
         li t0, 0
-        beq a3, t0, fim_comp
+        beq s0, t0, fim_comp
         lw s0, 0(a3)
         lw s1, 4(a3)
         add s0, s1, s0
         beq a5, s0, guarda_ind 
-        j fim_guarda_ind
-        guarda_ind:
-            mv t1, t2
-            j fim_comp
-        fim_guarda_ind:
-        addi a3, a3, 8
+        addi t2, t2, 1
+        lw a3, 8(a3)
+        lw s0, 0(a3)
+        j for_comp
+    guarda_ind:
+        mv t1, t2
     fim_comp:
     ret
 
@@ -74,29 +137,10 @@ _start:
     jal ra, read
     jal ra, converte_int
     jal ra, compara
-    addi a5, a5, 48
-    la a1, output_address
-    mv a1, a5
+    jal ra, num_digit
+    jal ra, int_char
     jal ra, write
+
 .section .data
 input_address: .skip 7
-
-.data
-head_node: 
-    .word 10
-    .word -4
-    .word node_1
-.skip 10
-node_1: 
-    .word 56
-    .word 78
-    .word node_2
-.skip 5
-node_3:
-    .word -100
-    .word -43
-    .word 0
-node_2:
-    .word -654
-    .word 590
-    .word node_3
+output_address: .skip 7
