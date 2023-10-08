@@ -92,34 +92,12 @@ pow:
 
 char_itoa:
     #(a0 int value,a1 char * str,a2 int base )
-    mv s0, ra
-
-    la a1, output_address
-    li t2, -1
-    beq t1, t2, imp_neg
-    li t2, 0
-    for_int_char:
-        beq t2, t3, fim_for_int_char
-        jal ra, pow
-        div a2, t1, t5 #digito
-        rem t1, t1, t5
-        addi a2, a2, 48
-        sb a2, 0(a1)
-        addi a1, a1, 1
-        addi t3, t3, -1
-        j for_int_char
-    fim_for_int_char:
-    li t2, '\n'
-    sb t2, 0(a1)
-    j fim_int_char
-    imp_neg:
-        li t2, '-'
-        sb t2, 0(a1)
-        li t2, '1'
-        sb t2, 1(a1)
-        li t2, '\n'
-        sb t2, 2(a1)
-    fim_int_char:
-    
-    mv ra, s0
-    ret
+    #preciso saber se eh negativo ou n 
+    li t0, -1
+    blt t0, a0, for_char_itoa # se t0 < a0 -> a0 eh positivo
+    mul a0, a0, t0
+    li t0, '-'
+    sb t0, 0(a1)
+    addi a1, a1, 1
+    for_char_itoa:
+        #pegar resto e inverter lista
