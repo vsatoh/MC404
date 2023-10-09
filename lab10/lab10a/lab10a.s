@@ -94,10 +94,33 @@ char_itoa:
     #(a0 int value,a1 char * str,a2 int base )
     #preciso saber se eh negativo ou n 
     li t0, -1
+    li t1, 0
     blt t0, a0, for_char_itoa # se t0 < a0 -> a0 eh positivo
     mul a0, a0, t0
     li t0, '-'
     sb t0, 0(a1)
     addi a1, a1, 1
     for_char_itoa:
+        li t0, 0
+        beq t0, a0, fim_for_char_itoa
+        addi t1, t1, 1 #numero de digitos
+        rem t0, a0, a2 #resto da divisao
+        sub a0, a0, t0 #elimina a menor casa decimal do numero xyz -> xy
+        addi t0, t0, 48
+        sb t0, 0(a3) #a3 armazena temporariamente a string
+        addi a3, a3, 1
         #pegar resto e inverter lista
+        j for_char_itoa
+    fim_for_char_itoa:
+    addi a3, a3, -1
+    li t0, 0
+    for_char_itoa2:
+        beq t0, t1, fim_for_char_itoa2
+        lb a4, 0(a3)
+        sb a4, 0(a1)
+        addi a3, a3, -1
+        addi a1, a1, 1
+        addi t0, t0, 1
+        j for_char_itoa2
+    fim_for_char_itoa2:
+        
