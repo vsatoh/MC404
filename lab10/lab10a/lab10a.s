@@ -1,6 +1,22 @@
 .section .text
 .globl _start
 
+read:
+    li a0, 0
+    la a1, input_address #  buffer to write the data
+    li a2, 7 # size (reads only 1 byte)
+    li a7, 63 # syscall read (63)
+    ecall
+    ret
+
+write:
+    li a0, 1          
+    la a1, output_address       
+    li a2, 20           
+    li a7, 64          
+    ecall    
+    ret
+
 void_puts:
     #Changes \0 for \n
     #string comes in a0
@@ -58,7 +74,7 @@ int_atoi:
 
     num_neg:
         addi a0, a0, 1
-        li a4, '\n'
+        li a4, '\0'
         lb a3, 0(a0)
         for2:
             beq a3, a4, fim2
@@ -78,17 +94,6 @@ int_atoi:
     ret
 
 
-pow:
-    li t4, 10
-    li t5, 1
-    li t6, 1
-    for_pow:
-        beq t6, t3, fim_pow
-        mul t5, t5, t4
-        addi t6,t6, 1
-        j for_pow
-    fim_pow:
-    ret
 
 char_itoa:
     #(a0 int value,a1 char * str,a2 int base )
@@ -106,7 +111,15 @@ char_itoa:
         addi t1, t1, 1 #numero de digitos
         rem t0, a0, a2 #resto da divisao
         sub a0, a0, t0 #elimina a menor casa decimal do numero xyz -> xy
+        div a0, a0, a2
+        #verificar se resto eh maior q 10
+        li t2, 10
+        bge t0, t2, hexa 
         addi t0, t0, 48
+        j fim_hexa
+        hexa:
+            addi t0, t0, 87
+        fim_hexa:
         sb t0, 0(a3) #a3 armazena temporariamente a string
         addi a3, a3, 1
         #pegar resto e inverter lista
@@ -123,4 +136,14 @@ char_itoa:
         addi t0, t0, 1
         j for_char_itoa2
     fim_for_char_itoa2:
-        
+    ret
+
+_start:
+    li a0, 54
+    li a2, 10
+    la a1, output_address
+    jal ra, char_itoa
+    jal ra, write
+.section .data
+input_address: .skip 7
+output_address: .skip 7
