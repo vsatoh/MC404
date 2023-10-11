@@ -94,7 +94,6 @@ int_atoi:
     ret
 
 
-
 char_itoa:
     #(a0 int value,a1 char * str,a2 int base )
     #preciso saber se eh negativo ou n 
@@ -139,8 +138,8 @@ char_itoa:
     ret
 
 _start:
-    li a0, 54
-    li a2, 10
+    li a0, 1521
+    li a2, 16
     la a1, output_address
     jal ra, char_itoa
     jal ra, write
