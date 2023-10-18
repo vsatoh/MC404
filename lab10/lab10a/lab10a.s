@@ -22,7 +22,7 @@ void_puts:
     #string comes in a0
     #needs to write the string
     la a1, output_address
-    li t0, '\0'
+    li t0, 0
     lb t1, 0(a0)
     li t2, 0
     for_void_puts:
@@ -48,18 +48,23 @@ str_gets:
     #Changes \n for \0
     #string return in a0
     #needs to read the string
+
+    li a0, 0
+    la a1, input_address #  buffer to write the data
+    li a2, 7 # size (reads only 1 byte)
+    li a7, 63 # syscall read (63)
+    ecall   
     li t0, '\n'
-    lb t1, 0(a0)
-    li t2, 0
+    lb t1, 0(a1)
     for_str_gets:
-        addi t2, t2, 1
         beq t0, t1, fim_str_gets
-        addi a0, a0, 1
-        lb t1, 0(a0)
+        addi a1, a1, 1
+        lb t1, 0(a1)
         j for_str_gets
     fim_str_gets:
-    li t0, '\0'
-    sb t0, 0(a0)
+    li t0, 0
+    sb t0, 0(a1)  
+    la a0, input_address
     ret
 
 int_atoi:
@@ -77,12 +82,12 @@ int_atoi:
     li a5, 0 #num de entrada
     li a4, '-'
     beq a3, a4, num_neg
-    li a4, '\0'
+    li a4, 0
     for2:
         beq a3, a4, fim2
-        li a4, '/'
-        blt a4, a3, brk2
-        li a4, '9'
+        li a4, '0'
+        blt a3, a4, brk2
+        li a4, 58
         bge a3, a4, brk2
         li a4, 10
         mul a5, a5, a4
@@ -91,19 +96,19 @@ int_atoi:
         brk2:
         addi a0, a0, 1
         lb a3, 0(a0)
-        li a4, '\0'
+        li a4, 0
         j for2
 
     num_neg:
         addi a0, a0, 1
-        li a4, '\0'
+        li a4, 0
         lb a3, 0(a0)
         for3:
             beq a3, a4, fim3
-            li a4, '/'
-            blt a4, a3, brk2
-            li a4, '9'
-            bge a3, a4, brk2
+            li a4, '0'
+            blt a3, a4, brk3
+            li a4, 58
+            bge a3, a4, brk3
             li a4, 10
             mul a5, a5, a4
             addi a3, a3, -48
@@ -111,7 +116,7 @@ int_atoi:
             brk3:
             addi a0, a0, 1
             lb a3, 0(a0)
-            li a4, '\0'
+            li a4, 0
             j for3
         fim3:
         li a4, -1
@@ -161,16 +166,22 @@ char_itoa:
         addi t0, t0, 1
         j for_char_itoa2
     fim_for_char_itoa2:
-    # addi a1, a1, 1
-    # li a4, '\n'
-    # sb a4, 0(a1)
+    addi a1, a1, 1
+    li a4, 0
+    sb a4, 0(a1)
     ret
 
+#int_linked_list:
+#(Node *head_node, int val)
+
 _start:
-    la a0, string
+
+    jal ra, str_gets
     jal ra, int_atoi
+
+
 .section .data
 input_address: .skip 7
 output_address: .skip 7
 
-string: .asciz "1010\0"
+string: .asciz "1010\n"
