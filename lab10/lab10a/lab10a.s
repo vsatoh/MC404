@@ -1,41 +1,24 @@
 .section .text
 .globl _start
 
-read:
-    li a0, 0
-    la a1, input_address #  buffer to write the data
-    li a2, 7 # size (reads only 1 byte)
-    li a7, 63 # syscall read (63)
-    ecall
-    ret
-
-write:
-    li a0, 1          
-    la a1, output_address       
-    li a2, 20           
-    li a7, 64          
-    ecall    
-    ret
-
-void_puts:
+puts:
     #Changes \0 for \n
     #string comes in a0
     #needs to write the string
-    la a1, output_address
+    la a0, output_address2
+    la a2, output_address
     li t0, 0
     lb t1, 0(a0)
-    li t2, 0
     for_void_puts:
-        addi t2, t2, 1
-        sb t1, 0(a1)
+        sb t1, 0(a2)
         beq t0, t1, fim_void_puts
         addi a0, a0, 1
-        addi a1, a1, 1
+        addi a2, a2, 1
         lb t1, 0(a0)
         j for_void_puts
     fim_void_puts:
     li t0, '\n'
-    sb t0, 0(a0)
+    sb t0, 0(a2)
 
     li a0, 1          
     la a1, output_address       
@@ -44,7 +27,7 @@ void_puts:
     ecall    
     ret
 
-str_gets:
+gets:
     #Changes \n for \0
     #string return in a0
     #needs to read the string
@@ -67,7 +50,7 @@ str_gets:
     la a0, input_address
     ret
 
-int_atoi:
+atoi:
     #(a0 char * str)
     #ignorar espacos antes e quaisquer tipo de caracter dps
     #return in a0 the value of char 
@@ -125,7 +108,7 @@ int_atoi:
     mv a0, a5
     ret
 
-char_itoa:
+itoa:
     #(a0 int value,a1 char * str,a2 int base )
     #preciso saber se eh negativo ou n 
     li t0, -1
@@ -166,22 +149,39 @@ char_itoa:
         addi t0, t0, 1
         j for_char_itoa2
     fim_for_char_itoa2:
-    addi a1, a1, 1
     li a4, 0
     sb a4, 0(a1)
     ret
 
-#int_linked_list:
-#(Node *head_node, int val)
+linked_list_search:
+    #(Node *head_node, int val)
+    li t1, -1
+    li t2, 0 #contador
+    lw s0, 0(a0)
+    for_comp:
+        li t0, 0
+        beq s0, t0, fim_comp
+        lw s0, 0(a0)
+        lw s1, 4(a0)
+        add s0, s1, s0
+        beq a1, s0, guarda_ind 
+        addi t2, t2, 1
+        lw a0, 8(a0)
+        lw s0, 0(a0)
+        j for_comp
+    guarda_ind:
+        mv a0, t2
+    fim_comp:
+    ret
 
-_start:
-
-    jal ra, str_gets
-    jal ra, int_atoi
-
+exit:
+    li a0, 0
+    li a7, 93
+    ecall
 
 .section .data
-input_address: .skip 7
-output_address: .skip 7
+input_address: .skip 20
+output_address: .skip 20
+output_address2: .skip 20
 
 string: .asciz "1010\n"
