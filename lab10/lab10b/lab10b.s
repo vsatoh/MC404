@@ -128,15 +128,15 @@ itoa:
     li t0, 0
     li t1, 0
     
-    bge a0, t0, for_char_itoa # se t0 < a0 -> a0 eh positivo
-    li t3, '-'
-    sb t3, 0(a1)
-    li t3, '1'
-    sb t3, 1(a1) 
-    li t3, 0
-    sb t3, 2(a1) 
-    mv a0, a1
-    ret
+    # bne a0, t0, for_char_itoa # se t0 < a0 -> a0 eh positivo
+    # li t3, '-'
+    # sb t3, 0(a1)
+    # li t3, '1'
+    # sb t3, 1(a1) 
+    # li t3, 0
+    # sb t3, 2(a1) 
+    # mv a0, a1
+    # ret
 
     for_char_itoa:
         addi t1, t1, 1 #numero de digitos
@@ -178,9 +178,12 @@ itoa:
 recursive_tree_search:
     #(Node *head_node, int val)
     li t2, 0
+    mv t3, a0
+    li a0, 0
+
     recursive_tree_search_rec:
     addi t2, t2, 1
-    lw t1, 0(a0)
+    lw t1, 0(t3)
     #Analisa se eh null ou se encontrou o resultado
     li t0, 0
     bne t1, t0, if2
@@ -195,14 +198,14 @@ recursive_tree_search:
         addi sp, sp, -4
         sw ra, 0(sp)
         addi sp, sp, -4
-        sw a0, 0(sp)
+        sw t3, 0(sp)
 
-        lw a0, 4(a0)
+        lw t3, 4(t3)
         jal ra, recursive_tree_search_rec
 
         li t0, 0
         bne t1, t0, brk_no_esq
-            lw a0, 0(sp)
+            lw t3, 0(sp)
         brk_no_esq:
         addi sp, sp, 4
 
@@ -218,14 +221,14 @@ recursive_tree_search:
         addi sp, sp, -4
         sw ra, 0(sp)
         addi sp, sp, -4
-        sw a0, 0(sp)
+        sw t3, 0(sp)
 
-        lw a0, 8(a0)
+        lw t3, 8(t3)
         jal ra, recursive_tree_search_rec
 
         li t0, 0
         bne t1, t0, brk_no_dir
-            lw a0, 0(sp)
+            lw t3, 0(sp)
         brk_no_dir:
         addi sp, sp, 4
 
@@ -233,7 +236,6 @@ recursive_tree_search:
         addi sp, sp, 4
         addi t2, t2, -1
         ret
-    li a0, 0
     ret
 
 exit:
