@@ -3,7 +3,6 @@
 
 read:
     #a0 base, a1 string 
-    la a1, input_address
     for_read:        
         la a0, base
         addi a0, a0, 2
@@ -43,21 +42,45 @@ write:
     ret
 
 ret_string:
-    addi sp, sp, -4
-    sw ra, 0(sp)  
+    la a1, input_address
+    li t3, 0
+    for_ret_string1:        
+        la a0, base
+        addi a0, a0, 2
 
-    jal ra, read
+        li t0, 1
+        sb t0, 0(a0)
 
-    lw ra, 0(sp)
-    addi sp, sp, 4    
+        addi a0, a0, 1
+        lb t0, 0(a0)
 
-    addi sp, sp, -4
-    sw ra, 0(sp)  
+        sb t0, 0(a1)
+        addi a1, a1, 1
 
-    jal ra, write
+        li t1, '\n'
+        addi t3, t3, 1 
+        beq t1, t0, fim_ret_string1
+        j for_ret_string1
+    fim_ret_string1: 
 
-    lw ra, 0(sp)
-    addi sp, sp, 4
+    sub a1, a1, t3
+    
+    for_ret_string2:
+        la a0, base
+        lb t0, 0(a1)
+
+        #carrega e imprime
+        sb t0, 1(a0)
+        li t1, 1
+        sb t1, 0(a0)
+
+        #condicao de parada
+        addi a1, a1, 1
+        li t1, '\n'
+        beq t1, t0, fim_ret_string2
+        j for_ret_string2
+    fim_ret_string2:
+
     ret
 
 reverse_string:
@@ -141,7 +164,6 @@ atoi:
     #(a0 char * str)
     #ignorar espacos antes e quaisquer tipo de caracter dps
     #return in a0 the value of char 
-    la a0, input_address
     lb a3, 0(a0)
     for2:
         li a4, '\n'
@@ -198,14 +220,19 @@ itoa:
     ret
 
 _start:
+    la a1, input_address
     jal ra, read
+    la a0, input_address
     jal ra, atoi
 
+    #switch case
     mv t0, a0 #entrada inicial
 
     jal ra, ret_string
 
 .section .data
 input_address: .skip 100
+output_address: .skip 100
+
 
 .set base, 0xFFFF0100
