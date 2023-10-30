@@ -259,17 +259,15 @@ itoa:
     li t1, 0
     bge a0, t1, for_char_itoa
     li t1, 4294967295
-    li t1, -1
-    mul a0, a0, t1
-    addi a0, a0, -1
-    xor a0, a0, t1
+    addi a0, a0, 1
+    add a0, t1, a0
     li t1, 0
 
     for_char_itoa:
         addi t1, t1, 1 #numero de digitos
-        rem t0, a0, a2 #resto da divisao
+        remu t0, a0, a2 #resto da divisao
         sub a0, a0, t0 #elimina a menor casa decimal do numero xyz -> xy
-        div a0, a0, a2
+        divu a0, a0, a2
         #verificar se resto eh maior q 10
         li t2, 10
         bge t0, t2, hexa 
@@ -307,11 +305,24 @@ _start:
     jal ra, read
     la a0, input_address
     jal ra, atoi
-
-    #switch case
-    #jal ra, ret_string
-    #jal ra, reverse_string
-    jal ra, hex_representation
+    mv s1, a0 #opcao
+    
+    li t0, 1
+    bne s1, t0, caso2
+        jal ra, ret_string
+        j fim_cases
+    caso2:
+    li t0, 2
+    bne s1, t0, caso3
+        jal ra, reverse_string
+        j fim_cases
+    caso3:
+    li t0, 3
+    bne s1, t0, caso4
+        jal ra, hex_representation
+        j fim_cases
+    caso4:
+    fim_cases:
 
 .section .data
 input_address: .skip 100
@@ -324,7 +335,7 @@ output_address2: .skip 100
 #checklist
 #ret_string ok
 #reverse_string ok
-#hexa_base
+#hexa_base ok
 #calculator
 #soma
 #sub
