@@ -209,6 +209,9 @@ hex_representation:
 
     ret
 
+pega_num:
+
+
 calculator:
 
 atoi:
@@ -328,7 +331,6 @@ _start:
 input_address: .skip 100
 output_address: .skip 100
 output_address2: .skip 100
-
 
 .set base, 0xFFFF0100
 
