@@ -16,7 +16,6 @@ read:
             li t1, 0
         bne t0, t1, brk_read
 
-
         addi a0, a0, 1
         lb t0, 0(a0)
 
@@ -70,7 +69,6 @@ ret_string:
             li t1, 0
         bne t0, t1, brk_ret_string1
 
-
         addi a0, a0, 1
         lb t0, 0(a0)
 
@@ -111,6 +109,7 @@ ret_string:
     ret
 
 reverse_string:
+
     addi sp, sp, -4
     sw ra, 0(sp)
 
