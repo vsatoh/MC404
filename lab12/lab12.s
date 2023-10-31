@@ -209,10 +209,118 @@ hex_representation:
 
     ret
 
-pega_num:
-
-
 calculator:
+    #le uma entrada nova
+    addi sp, sp, -4
+    sw ra, 0(sp)  
+
+    la a1, output_address
+    jal ra, read
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
+
+    #str do primeiro num
+    la a1, output_address
+    li t2, 0
+    li s1, 0
+    for_calc1:
+        lb t1, 0(a1)
+        li t0, ' '
+        beq t0, t1, fim_for_calc1
+        sb t1, 0(s1)
+        addi a1, a1, 1
+        addi s1, s1, 1
+        addi t2, t2, 1
+        j for_calc1
+    fim_for_calc1:
+    li t1, '\n'
+    sb t1, 0(s1)
+    sub s1, s1, t2
+
+    #str do sinal
+    addi a1, a1, 1
+    lb t1, 0(a1)
+    sb t1, 0(s2) #sinal da operacao
+
+    #str do segundo num
+    li t2, 0
+    addi a1, a1, 2
+    for_calc2:
+        lb t1, 0(a1)
+        sb t1, 0(s3)
+        addi a1, a1, 1
+        addi s3, s3, 1
+        addi t2, t2, 1
+        li t0, '\n'
+        beq t0, t1, fim_for_calc2
+        j for_calc2
+    fim_for_calc2:
+    sub s3, s3, t2
+
+    #transforma o primeiro num em int
+    mv a0, s1
+    addi sp, sp, -4
+    sw ra, 0(sp)  
+
+    jal ra, atoi
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    mv s1, a0
+
+    #transforma o segundo num em int
+    mv a0, s3
+    addi sp, sp, -4
+    sw ra, 0(sp)  
+
+    jal ra, atoi
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    mv s3, a0
+
+    li t0, '+'
+    bne s2, t0, caso_sub
+        add s1, s1, s3
+        j fim_cases_op
+    caso_sub:
+    li t0, '-'
+    bne s2, t0, caso_mul
+        sub s1, s1, s3
+        j fim_cases_op
+    caso_mul:
+    li t0, '*'
+    bne s2, t0, caso_div
+        mul s1, s1, s3
+        j fim_cases_op
+    caso_div:
+        div s1, s1, s3
+    fim_cases_op:
+
+    #converte pra string
+    addi sp, sp, -4
+    sw ra, 0(sp) 
+
+    la a1, output_address
+    mv a0, s1
+    li a2, 10
+    jal ra, itoa
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
+
+    #imprime a string
+    addi sp, sp, -4
+    sw ra, 0(sp) 
+
+    la a1, output_address
+    jal ra, write
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
+
+    ret
 
 atoi:
     #(a0 char * str)
@@ -325,6 +433,7 @@ _start:
         jal ra, hex_representation
         j fim_cases
     caso4:
+        jal ra, calculator
     fim_cases:
 
 .section .data
