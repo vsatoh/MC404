@@ -7,12 +7,12 @@
 .globl exit
 
 puts:
-    #Changes \0 for \n
+    #Muda 0 para n
     #string comes in a0
     #needs to write the string
     li t0, 0
-    mv t3, a0
-    li t2, 0
+    mv t3, a0 #salva o ponteiro de a0 (posicao inicial)
+    li t2, 0 #numero de elementos de a0
     for_void_puts:
         lb t1, 0(a0)
         beq t0, t1, fim_void_puts
@@ -31,18 +31,17 @@ puts:
     li a7, 64          
     ecall   
 
-    mv a0, t3
+    mv a0, t3 #coloca a0 em sua posicao inicial
     li t0, 0
-    add a0, a0, t2
+    add a0, a0, t2 #acessa o ultimo elemento (\n)
     sb t0, 0(a0)
 
     ret
 
 gets:
-    #Changes \n for \0
-    #string return in a0
-    #needs to read the string
-    mv t2, a0 #a0 eh o ponteiro pro buffer
+    #Muda \n para 0
+    #string return em a0
+    mv t3, a0 #a0 eh o ponteiro pro buffer
     mv a1, a0
     li t0, '\n'
     for_str_gets:
@@ -61,7 +60,7 @@ gets:
     li t0, 0
     sb t0, 0(a1)  
 
-    mv a0, t2
+    mv a0, t3 #coloca a0 em sua posicao inicial
     ret
 
 atoi:
