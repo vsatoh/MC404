@@ -222,43 +222,21 @@ calculator:
     #str do primeiro num
     la a1, output_address
     li t2, 0
-    li s1, 0
     for_calc1:
         lb t1, 0(a1)
         li t0, ' '
         beq t0, t1, fim_for_calc1
-        sb t1, 0(s1)
+        sb t1, 0(a0)
         addi a1, a1, 1
-        addi s1, s1, 1
+        addi a0, a0, 1
         addi t2, t2, 1
         j for_calc1
     fim_for_calc1:
     li t1, '\n'
-    sb t1, 0(s1)
-    sub s1, s1, t2
-
-    #str do sinal
-    addi a1, a1, 1
-    lb t1, 0(a1)
-    sb t1, 0(s2) #sinal da operacao
-
-    #str do segundo num
-    li t2, 0
-    addi a1, a1, 2
-    for_calc2:
-        lb t1, 0(a1)
-        sb t1, 0(s3)
-        addi a1, a1, 1
-        addi s3, s3, 1
-        addi t2, t2, 1
-        li t0, '\n'
-        beq t0, t1, fim_for_calc2
-        j for_calc2
-    fim_for_calc2:
-    sub s3, s3, t2
+    sb t1, 0(a0)
+    sub a0, a0, t2
 
     #transforma o primeiro num em int
-    mv a0, s1
     addi sp, sp, -4
     sw ra, 0(sp)  
 
@@ -268,8 +246,26 @@ calculator:
     addi sp, sp, 4
     mv s1, a0
 
+    #str do sinal
+    addi a1, a1, 1
+    lb s2, 0(a1)
+
+    #str do segundo num
+    li t2, 0
+    addi a1, a1, 2
+    for_calc2:
+        lb t1, 0(a1)
+        sb t1, 0(a0)
+        addi a1, a1, 1
+        addi a0, a0, 1
+        addi t2, t2, 1
+        li t0, '\n'
+        beq t0, t1, fim_for_calc2
+        j for_calc2
+    fim_for_calc2:
+    sub a0, a0, t2
+
     #transforma o segundo num em int
-    mv a0, s3
     addi sp, sp, -4
     sw ra, 0(sp)  
 
@@ -279,17 +275,17 @@ calculator:
     addi sp, sp, 4
     mv s3, a0
 
-    li t0, '+'
+    li t0, 43
     bne s2, t0, caso_sub
         add s1, s1, s3
         j fim_cases_op
     caso_sub:
-    li t0, '-'
+    li t0, 45
     bne s2, t0, caso_mul
         sub s1, s1, s3
         j fim_cases_op
     caso_mul:
-    li t0, '*'
+    li t0, 42
     bne s2, t0, caso_div
         mul s1, s1, s3
         j fim_cases_op
@@ -365,13 +361,25 @@ atoi:
     ret
 
 itoa:
-    #a0 num, a2 base
+    #a0 num, a1 str saida, a2 base
     li t1, 0
     bge a0, t1, for_char_itoa
+    li t1, 16
+    bne t1, a2, neg_b10
+
     li t1, 4294967295
     addi a0, a0, 1
     add a0, t1, a0
     li t1, 0
+    j for_char_itoa
+
+    neg_b10:
+        li t1, 45
+        sb t1, 0(a1)
+        li t1, -1
+        mul a0, a0, t1
+        addi a1, a1, 1
+        li t1, 0
 
     for_char_itoa:
         addi t1, t1, 1 #numero de digitos
