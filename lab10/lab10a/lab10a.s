@@ -41,7 +41,7 @@ puts:
 gets:
     #Muda \n para 0
     #string return em a0
-    mv t3, a0 #a0 eh o ponteiro pro buffer
+    mv t2, a0 #a0 eh o ponteiro pro buffer
     mv a1, a0
     li t0, '\n'
     for_str_gets:
@@ -60,7 +60,7 @@ gets:
     li t0, 0
     sb t0, 0(a1)  
 
-    mv a0, t3 #coloca a0 em sua posicao inicial
+    mv a0, t2 #coloca a0 em sua posicao inicial
     ret
 
 atoi:
@@ -181,7 +181,6 @@ linked_list_search:
         li t0, 0
         lw s0, 0(a0)
         beq s0, t0, fim_comp
-        lw s0, 0(a0)
         lw s1, 4(a0)
         add s2, s1, s0
         beq a1, s2, guarda_ind #a1 eh o valor 
