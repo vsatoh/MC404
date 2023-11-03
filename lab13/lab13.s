@@ -1,7 +1,4 @@
-sleep:
-    #busy waiting
-    #recebe o tempo que quer ficar parado em a0
-    la t0, _system_time
+
 
 gpt_interrupt:
     #gera uma interupcao a cada 100 milisegundos
@@ -11,26 +8,19 @@ gpt_interrupt:
 
     lw a1, 4(a0)
 
-    for_gpt_interrupt:
+    brk_gpt: #n avancar enquanto n terminar a leitura
+        lb t0, 0(a0)
+        li t1, 0
+    bne t0, t1, brk_gpt
 
-        brk_gpt: #n avancar enquanto n terminar a leitura
-            lb t0, 0(a0)
-            li t1, 0
-        bne t0, t1, brk_gpt
+    li t0, 1
+    sb t0, 0(a0)
 
-        li t0, 1
-        sb t0, 0(a0)
+    la a2, _system_time
+    lw a2, 4(a0)
 
-        lw a2, 4(a0)
-
-        sub a2, a2, a1
-        li t0, 100
-
-        bge a2, t0, fim_for_gpt_interrupt
-        j fim_for_gpt_interrupt
-    
-    fim_for_gpt_interrupt:
-        #gera uma interrupacao
+    li t0, 100
+    sw t0, 8(a0)
 
     ret
 
@@ -57,5 +47,6 @@ _start:
 .set base_gpt, 0xFFFF0100
 .set base_synth, 0xFFFF0300
 
-.section .data
-_system_time: .skip 100
+_system_time: .word 0
+
+stack_do_programa: .skip 4096

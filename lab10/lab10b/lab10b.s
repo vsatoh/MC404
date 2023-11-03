@@ -30,7 +30,7 @@ puts:
     li a0, 1                    
     li a7, 64          
     ecall   
-
+    
     mv a0, t3 #coloca a0 em sua posicao inicial
     li t0, 0
     add a0, a0, t2 #acessa o ultimo elemento (\n)
