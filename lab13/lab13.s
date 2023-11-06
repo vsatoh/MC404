@@ -30,12 +30,37 @@ play_note:
 
 interrupcao:    
     csrrw sp, mscratch, sp # Troca sp com mscratch
-    addi sp, sp, -64 # Aloca espaço na pilha
-    sw a0, 0(sp) # Salva a0
+    addi sp, sp, -32 # Aloca espaço na pilha
+    sw a0, 0(sp)
     sw a1, 4(sp) 
+    sw a2, 8(sp)
+    sw a3, 12(sp)
+    sw a4, 16(sp) 
+
+    sw t0, 20(sp)
+    sw t1, 24(sp)
+
+    sw S0, 28(sp)
+
+    #trata interrupcao
+
+    sw S0, 28(sp)
+
+    sw t1, 24(sp)
+    sw t0, 20(sp)
+
+    sw a4, 16(sp) 
+    sw a3, 12(sp)
+    sw a2, 8(sp)
+    sw a1, 4(sp) 
+    sw a0, 0(sp)
+
+    addi sp, sp, 32
 
     jal
 
+    addi sp, sp, 64 # Desaloca espaço da pilha
+    csrrw sp, mscratch, sp
 main:
 
 
