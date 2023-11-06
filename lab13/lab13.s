@@ -30,7 +30,7 @@ play_note:
 
 interrupcao:    
     csrrw sp, mscratch, sp # Troca sp com mscratch
-    addi sp, sp, -32 # Aloca espaço na pilha
+    addi sp, sp, -36 # Aloca espaço na pilha
     sw a0, 0(sp)
     sw a1, 4(sp) 
     sw a2, 8(sp)
@@ -40,33 +40,38 @@ interrupcao:
     sw t0, 20(sp)
     sw t1, 24(sp)
 
-    sw S0, 28(sp)
+    sw s0, 28(sp)
 
     #trata interrupcao
+    sw ra, 32(sp)
 
-    sw S0, 28(sp)
+    jal ra, gpt_interrupt
 
-    sw t1, 24(sp)
-    sw t0, 20(sp)
+    lw ra, 32(sp)
 
-    sw a4, 16(sp) 
-    sw a3, 12(sp)
-    sw a2, 8(sp)
-    sw a1, 4(sp) 
-    sw a0, 0(sp)
+    lw s0, 28(sp)
 
-    addi sp, sp, 32
+    lw t1, 24(sp)
+    lw t0, 20(sp)
 
-    jal
+    lw a4, 16(sp) 
+    lw a3, 12(sp)
+    lw a2, 8(sp)
+    lw a1, 4(sp) 
+    lw a0, 0(sp)
 
-    addi sp, sp, 64 # Desaloca espaço da pilha
+    addi sp, sp, 36 # Desaloca espaço da pilha
     csrrw sp, mscratch, sp
+
+    ret
+
 main:
 
 
 _start:
-
-
+    la t0, stack_do_programa
+    csrw mtvec, t0 
+    jal main
 
 
 .data
