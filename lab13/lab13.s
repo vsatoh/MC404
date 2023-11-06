@@ -1,20 +1,13 @@
-
-
 gpt_interrupt:
     #gera uma interupcao a cada 100 milisegundos
     la a0, base_gpt
     li t0, 1
     sb t0, 0(a0)
 
-    lw a1, 4(a0)
-
     brk_gpt: #n avancar enquanto n terminar a leitura
         lb t0, 0(a0)
         li t1, 0
     bne t0, t1, brk_gpt
-
-    li t0, 1
-    sb t0, 0(a0)
 
     la a2, _system_time
     lw a2, 4(a0)
@@ -34,6 +27,14 @@ play_note:
     sb a0, 0(s0)
 
     ret
+
+interrupcao:    
+    csrrw sp, mscratch, sp # Troca sp com mscratch
+    addi sp, sp, -64 # Aloca espaço na pilha
+    sw a0, 0(sp) # Salva a0
+    sw a1, 4(sp) 
+
+    jal
 
 main:
 
