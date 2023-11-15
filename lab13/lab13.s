@@ -15,9 +15,10 @@ gpt_interrupt:
     bne t0, t1, brk_gpt
 
     la a2, _system_time
+    lw t1, 0(a2)
     lw t0, 4(a0)
-    add a2, a2, t0
-    sw a2, 0(a2)
+    add t0, t1, t0
+    sw t0, 0(a2)
 
     li t0, 100
     sw t0, 8(a0)
@@ -38,6 +39,7 @@ play_note:
 interrupcao:    
     csrrw sp, mscratch, sp # Troca sp com mscratch
     addi sp, sp, -32 # Aloca espaço na pilha
+    
     sw a0, 0(sp)
     sw a1, 4(sp) 
     sw a2, 8(sp)
@@ -50,7 +52,6 @@ interrupcao:
     sw s0, 28(sp)
 
     #trata interrupcao
-
     jal ra, gpt_interrupt
 
     lw s0, 28(sp)
@@ -72,6 +73,8 @@ interrupcao:
 _start:
     la t0, interrupcao
     csrw mtvec, t0 
+
+    jal gpt_interrupt
 
     la t0, isr_stack_end # t0 <= base da pilha
     csrw mscratch, t0 
@@ -99,6 +102,5 @@ isr_stack:
 isr_stack_end:
 
 .text
-
 .set base_gpt, 0xFFFF0100
 .set base_synth, 0xFFFF0300
