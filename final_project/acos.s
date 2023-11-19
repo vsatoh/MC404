@@ -106,6 +106,25 @@ Syscall_set_handbrake:
 
     ret
 
+Syscall_read_sensors:
+#a0: address of an array with 256 
+#elements that will store the values read by the luminosity sensor.
+    li a7, 12
+    ecall
+
+    ret
+
+Syscall_read_sensor_distance:
+    li a7, 13
+    ecall
+
+    #Se o valor for menor que 20, a0 tera valor -1
+    la t0, value_dist_sensor
+    lw t0, 0(t0)
+    sw t0, 0(a0)
+
+    ret
+
 Syscall_get_position:
     #a0: address of the variable that will store the value of x position. 
     #a1: address of the variable that will store the value of y position.
@@ -125,6 +144,53 @@ Syscall_get_position:
     lw t1, 0(t0)
     sw t1, 0(a2)
     
+    ret
+
+Syscall_get_rotation:
+    #a0, euler ang x
+    #a1, y
+    #a2, z
+    li a7, 16
+    ecall
+
+    la t0, x_ang
+    lw t1, 0(t0)
+    sw t1, 0(a0)
+
+    la t0, y_ang
+    lw t1, 0(t0)
+    sw t1, 0(a1)
+    
+    la t0, z_ang
+    lw t1, 0(t0)
+    sw t1, 0(a2)
+
+    ret
+
+Syscall_read_serial:
+    #a0: buffer
+    #a1: size
+    li a7, 16
+    ecall
+
+    la t0, num_carachters
+    lw t1, 0(t0)
+    sw t1, 0(a0)
+
+    ret
+
+Syscall_write_seral:
+    #a0: buffer
+    #a1: size
+    li a7, 17
+    ecall
+
+    ret
+
+Syscall_get_systime:
+    li a7, 20
+    ecall
+
     ret
 
 check_destiny:
@@ -164,13 +230,15 @@ _start:
     la a0, isr_stack_end
     csrw mscratch, a0 
 
-    csrr t1, mstatus     
-    li t2, ~0x1800     
-    and t1, t1, t2       
+    csrr t1, mstatus       
+    li t2, ~0x1800         
+    and t1, t1, t2          
     csrw mstatus, t1
  
-    la t0, user_main    
-    csrw mepc, t0      
+    la t0, user_main       
+    csrw mepc, t0          
+
+    mret
 
     jal user_main
 
@@ -238,3 +306,13 @@ x_pos: .word 0
 y_pos: .word 0
 
 z_pos: .word 0
+
+x_ang: .word 0
+
+y_ang: .word 0
+
+z_ang: .word 0
+
+value_dist_sensor: .word 0
+
+num_carachters: .word 0
