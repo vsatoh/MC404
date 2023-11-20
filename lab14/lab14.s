@@ -17,7 +17,7 @@ int_handler:
 
   sw t0, 20(sp)
   sw t1, 24(sp)
-
+  
   sw s0, 28(sp)
 
   li t0, 10 

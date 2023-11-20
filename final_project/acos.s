@@ -1,7 +1,16 @@
 .text
 .align 4
 .globl _start
-.globl control_logic
+.globl Syscall_set_engine_and_steering
+.globl Syscall_set_handbrake
+.globl Syscall_read_sensors
+.globl Syscall_read_sensor_distance
+.globl Syscall_get_position
+.globl Syscall_get_rotation
+.globl Syscall_read_serial
+.globl Syscall_write_seral
+.globl Syscall_get_systime
+
 
 int_handler:
   ###### Syscall and Interrupts handler ######
@@ -29,6 +38,8 @@ int_handler:
   sb a1, 0(a2)
   addi a2, a2, 1
   sb a0, 0(a2)
+
+    #trabalhar em mecanismo para retornar valor
 
   j fim
 
@@ -118,7 +129,7 @@ Syscall_read_sensor_distance:
     li a7, 13
     ecall
 
-    #Se o valor for menor que 20, a0 tera valor -1
+    #Se n tiver nd em 20 m, ret -1
     la t0, value_dist_sensor
     lw t0, 0(t0)
     sw t0, 0(a0)
