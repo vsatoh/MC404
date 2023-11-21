@@ -1,239 +1,271 @@
 .text
-.align 4
 .globl _start
-.globl Syscall_set_engine_and_steering
-.globl Syscall_set_handbrake
-.globl Syscall_read_sensors
-.globl Syscall_read_sensor_distance
-.globl Syscall_get_position
-.globl Syscall_get_rotation
-.globl Syscall_read_serial
-.globl Syscall_write_seral
-.globl Syscall_get_systime
-
 
 int_handler:
   ###### Syscall and Interrupts handler ######
   
-  csrrw sp, mscratch, sp # Troca sp com mscratch
-  addi sp, sp, -32 # Aloca espaço na pilha
+    csrrw sp, mscratch, sp # Troca sp com mscratch
+    addi sp, sp, -32 # Aloca espaço na pilha
 
-  sw a0, 0(sp)
-  sw a1, 4(sp) 
-  sw a2, 8(sp)
-  sw a3, 12(sp)
-  sw a4, 16(sp) 
+    sw a3, 0(sp)
+    sw a4, 4(sp) 
+    sw a5, 8(sp)
+    sw t0, 12(sp)
+    sw t1, 16(sp) 
+    sw t2, 20(sp)
+    sw t3, 24(sp)
+    sw t4, 28(sp)
 
-  sw t0, 20(sp)
-  sw t1, 24(sp)
+    li t0, 10 
+    beq a7, t0, Syscall_set_engine_and_steering
+    li t0, 11 
+    beq a7, t0, Syscall_set_handbrake
+    li t0, 12
+    beq a7, t0, Syscall_read_sensors
+    li t0, 13
+    beq a7, t0, Syscall_read_sensor_distance
+    li t0, 15
+    beq a7, t0, Syscall_get_position
+    li t0, 16
+    beq a7, t0, Syscall_get_rotation
+    li t0, 17
+    beq a7, t0, Syscall_read_serial
+    li t0, 18
+    beq a7, t0, Syscall_write_seral
+    li t0, 20
+    beq a7, t0, Syscall_get_systime
 
-  sw s0, 28(sp)
+    j fim_syscall
 
-  li t0, 10 
-  bne a7, t0, handbrake
-  #Seta o carro pra andar
-  la a2, base
+    Syscall_set_engine_and_steering:
 
-  addi a2, a2, 32
-  sb a1, 0(a2)
-  addi a2, a2, 1
-  sb a0, 0(a2)
+        la a3, base_car
 
-    #trabalhar em mecanismo para retornar valor
+        li t0, 128
+        bge a1, t0, fail_set_engine_and_steering
+        li t0, -127
+        blt a1, t0, fail_set_engine_and_steering
 
-  j fim
+        li t0, 2
+        bge a0, t0, fail_set_engine_and_steering
+        li t0, -1
+        blt a0, t0, fail_set_engine_and_steering
 
-  handbrake:
-  #ativa o freio de mao
-  li t0, 11 
-  bne a7, t0, read_coordinates
+        sb a1, 32(a3)
+        addi a3, a3, 1
+        sb a0, 33(a3)
 
-  la a2, base
-  addi a2, a2, 34
-  sb a0, 0(a2)
+        j fim_syscall
 
-  j fim
+        fail_set_engine_and_steering:
+            li a0, -1
+            j fim_syscall
 
-  read_coordinates:
+    Syscall_set_handbrake:
 
-  la t0, base
-  li t1, 1
-  sb t1, 0(t0)
+        la a3, base_car
+        addi a3, a3, 34
+        sb a0, 0(a3)
 
-  brk1: #n avancar enquanto n terminar a leitura
-    lb t2, 0(t0)
-    li t1, 0
-  bne t2, t1, brk1
+        j fim_syscall
 
-  la t1, x_pos
-  addi t0, t0, 16
-  lw t2, 0(t0) #x0
-  sw t2, 0(t1)
+    Syscall_read_sensors:
 
-  la t1, y_pos
-  addi t0, t0, 4
-  lw t2, 0(t0) #y0
-  sw t2, 0(t1)
+        la a3, base_car
+        mv t3, a0 #salva o ponteiro para a0
 
-  la t1, z_pos
-  addi t0, t0, 4
-  lw t2, 0(t0) #z0
-  sw t2, 0(t1)
+        li t0, 1
+        sb t0, 1(a3)
 
-  fim:
-  
-  lw s0, 28(sp)
+        busy_waiting_read_sensors: #n avancar enquanto n terminar a leitura
+            lb t0, 1(a3)
+            li t1, 0
+        bne t0, t1, busy_waiting_read_sensors
 
-  lw t1, 24(sp)
-  lw t0, 20(sp)
+        #copiar os dados lidos
+        li t0, 0
+        li t1, 256
+        addi a3, a3, 36
+        copy_read_sensors:
+            bge t0, t1, fim_copy_read_sensors
+            lb t2, 0(a3)
+            sb t2, 0(a0)
+            addi t0, t0, 1
+            addi a3, a3, 1
+            addi a0, a0, 1
+            j copy_read_sensors
+        fim_copy_read_sensors:
+            mv a0, t3 #volta a apontar para o inicio do vetor
+        j fim_syscall
 
-  lw a4, 16(sp) 
-  lw a3, 12(sp)
-  lw a2, 8(sp)
-  lw a1, 4(sp) 
-  lw a0, 0(sp)
+    Syscall_read_sensor_distance:
+        la a3, base_car
+        li t0, 1
+        sb t0, 2(a3)
 
-  addi sp, sp, 32
-  csrrw sp, mscratch, sp
+        busy_waiting_read_sensors_distance: #n avancar enquanto n terminar a leitura
+            lb t0, 0(a3)
+            li t1, 0
+        bne t0, t1, busy_waiting_read_sensors_distance      
 
-  csrr t0, mepc  
-                 
-  addi t0, t0, 4
-  csrw mepc, t0 
-  mret          
-  
-Syscall_set_engine_and_steering:
-    #a0: Movement direction
-    #a1: Steering wheel angle
-    li a7, 10
-    ecall
+        #Se n tiver nd em 20 m, ret -1
+        lw a0, 28(a3)
+        j fim_syscall
 
-    ret
+    Syscall_get_position:
+        #a0: address of the variable that will store the value of x position. 
+        #a1: address of the variable that will store the value of y position.
+        #a2: address of the variable that will store the value of z position.
+        la a3, base_car
+        li t0, 1
+        sb t0, 0(a3)
 
-Syscall_set_handbrake:
-    #a0 contem 0 ou 1
-    li a7, 11
-    ecall
+        busy_waiting_get_position: #n avancar enquanto n terminar a leitura
+            lb t0, 0(a3)
+            li t1, 0
+        bne t0, t1, busy_waiting_get_position
 
-    ret
+        addi a3, a3, 16
+        lw t0, 0(a3) #x0
+        sw t0, 0(a0)
 
-Syscall_read_sensors:
-#a0: address of an array with 256 
-#elements that will store the values read by the luminosity sensor.
-    li a7, 12
-    ecall
+        addi t0, t0, 4
+        lw t0, 0(a3) #y0
+        sw t0, 0(a1)
 
-    ret
+        addi t0, t0, 4
+        lw t0, 0(a3) #z0
+        sw t0, 0(a2)
+        
+        j fim_syscall
 
-Syscall_read_sensor_distance:
-    li a7, 13
-    ecall
+    Syscall_get_rotation:
+        la a3, base_car
+        li t0, 1
+        sb t0, 0(a3)
 
-    #Se n tiver nd em 20 m, ret -1
-    la t0, value_dist_sensor
-    lw t0, 0(t0)
-    sw t0, 0(a0)
+        busy_waiting_get_rotation: #n avancar enquanto n terminar a leitura
+            lb t0, 0(a3)
+            li t1, 0
+        bne t0, t1, busy_waiting_get_rotation
 
-    ret
+        addi a3, a3, 4
+        lw t0, 0(a3) #x0
+        sw t0, 0(a0)
 
-Syscall_get_position:
-    #a0: address of the variable that will store the value of x position. 
-    #a1: address of the variable that will store the value of y position.
-    #a2: address of the variable that will store the value of z position.
-    li a7, 15
-    ecall
+        addi t0, t0, 4
+        lw t0, 0(a3) #y0
+        sw t0, 0(a1)
 
-    la t0, x_pos
-    lw t1, 0(t0)
-    sw t1, 0(a0)
+        addi t0, t0, 4
+        lw t0, 0(a3) #z0
+        sw t0, 0(a2)
+        
+        j fim_syscall
 
-    la t0, y_pos
-    lw t1, 0(t0)
-    sw t1, 0(a1)
-    
-    la t0, z_pos
-    lw t1, 0(t0)
-    sw t1, 0(a2)
-    
-    ret
+    Syscall_read_serial:
+        #a0 buffer
+        #a1 num bytes a serem lidos
+        la a3, base_serial
+        mv t3, a0 #salva a posicao inicial do buffer
+        li t2, 0 # num de caracteres lidos
+        for_read_serial:
+            li t0, 1
+            sb t0, 2(a3)
 
-Syscall_get_rotation:
-    #a0, euler ang x
-    #a1, y
-    #a2, z
-    li a7, 16
-    ecall
+            busy_waiting_read_serial:
+                lb t0, 2(a3)
+                li t1, 0
+            bne t0, t1, busy_waiting_read_serial
 
-    la t0, x_ang
-    lw t1, 0(t0)
-    sw t1, 0(a0)
+            lb t0, 3(a3)
+            sb t0, 0(a0)
 
-    la t0, y_ang
-    lw t1, 0(t0)
-    sw t1, 0(a1)
-    
-    la t0, z_ang
-    lw t1, 0(t0)
-    sw t1, 0(a2)
+            addi a0, a0, 1
+            addi t2, t2, 1
 
-    ret
+            beq t2, a1, fim_for_read_serial
+            j for_read_serial
+        fim_for_read_serial:
+            mv a0, t3
+            mv a0, t2
 
-Syscall_read_serial:
-    #a0: buffer
-    #a1: size
-    li a7, 16
-    ecall
+        j fim_syscall
 
-    la t0, num_carachters
-    lw t1, 0(t0)
-    sw t1, 0(a0)
+    Syscall_write_seral:
+        la a3, base_serial
+        mv t3, a0
+        li t2, 0
+        for_write_serial:
+            #imprime
+            lb t0, 0(a0)
+            sb t0, 1(a3)
+            li t1, 1
+            sb t1, 0(a3)
 
-    ret
+            busy_waiting_write_serial:
+                lb t0, 0(a3)
+                li t1, 0
+            bne t0, t1, busy_waiting_write_serial 
 
-Syscall_write_seral:
-    #a0: buffer
-    #a1: size
-    li a7, 17
-    ecall
+            addi a0, a0, 1
+            addi t2, t2, 1
 
-    ret
+            beq t2, a1, fim_for_write_serial
+            j for_write_serial
 
-Syscall_get_systime:
-    li a7, 20
-    ecall
+        fim_for_write_serial:
+            mv a0, t3
+            j fim_syscall
 
-    ret
+    Syscall_get_systime:
+        la a3, base_gpt
+        li t0, 1
+        sb t0, 0(a3)
 
-check_destiny:
-    #a0 x0, a1 y0, a2 z0
+        busy_waiting_get_systime:
+            lb t0, 0(a3)
+            li t1, 0
+        bne t0, t1, busy_waiting_get_systime 
 
-    li t1, 73
-    li t2, 1
-    li t3, -19
+        lw a0, 4(a3)
 
-    sub t1, t1, a0 #x - x0
-    sub t2, t2, a1 #y - y0
-    sub t3, t3, a2 #z - z0
+        j fim_syscall
 
-    mul t1, t1, t1 #(x - x0)^2
-    mul t2, t2, t2 #(y - y0)^2
-    mul t3, t3, t3 #(z - z0)^2
+    fim_syscall:
 
-    add s0, t1, t2
-    add s0, s0, t3 #s0 = (x - x0)^2 + (y - y0)^2 + (z - z0)^2
+    lw t4, 28(sp)
+    lw t3, 24(sp)
+    lw t2, 20(sp)
+    lw t1, 16(sp) 
+    lw t0, 12(sp)
+    lw a5, 8(sp)
+    lw a4, 4(sp) 
+    lw a3, 0(sp)
 
-    li s1, 225 #s1 = r^2 (225)
+    addi sp, sp, 32
+    csrrw sp, mscratch, sp
 
-    bge s1, s0, fim_check_destiny
-    li a0, 0
-    ret
+    csrr t0, mepc  
+                    
+    addi t0, t0, 4
+    csrw mepc, t0 
+    mret          
 
-    fim_check_destiny: 
-        #interrompe o codigo
-        li a0, 1
-        ret
+user_mode:
+    csrr t1, mstatus       
+    li t2, ~0x1800         
+    and t1, t1, t2          
+    csrw mstatus, t1
+ 
+    la t0, main       
+    csrw mepc, t0          
+
+    mret
 
 _start:
+
+    li sp, 0x07FFFFFC
 
     la t0, int_handler  
     csrw mtvec, t0     
@@ -241,89 +273,29 @@ _start:
     la a0, isr_stack_end
     csrw mscratch, a0 
 
-    csrr t1, mstatus       
-    li t2, ~0x1800         
-    and t1, t1, t2          
+    csrr t1, mie # Seta o bit 11 (MEIE)
+    li t2, 0x800 # do registrador mie
+    or t1, t1, t2
+    csrw mie, t1
+
+    # Habilita Interrupções Global
+    csrr t1, mstatus # Seta o bit 3 (MIE)
+    ori t1, t1, 0x8 # do registrador mstatus
     csrw mstatus, t1
- 
-    la t0, user_main       
-    csrw mepc, t0          
 
-    mret
+    jal user_mode
 
-    jal user_main
-
-control_logic:
-
-    for_control_logic:
-
-      li a0, 1
-      li a1, -15
-
-      addi sp, sp, -4
-      sw ra, 0(sp)
-
-      jal Syscall_set_engine_and_steering
-      
-      lw ra, 0(sp)
-      addi sp, sp, 4
-
-
-      addi sp, sp, -4
-      sw ra, 0(sp)
-
-      jal Syscall_get_position
-      
-      lw ra, 0(sp)
-      addi sp, sp, 4
-
-
-      addi sp, sp, -4
-      sw ra, 0(sp)
-
-      jal ra, check_destiny
-
-      lw ra, 0(sp)
-      addi sp, sp, 4
-
-      li t1, 1
-      beq a0, t1, fim_for_control_logic
-
-      j for_control_logic
-    fim_for_control_logic:
-
-    addi sp, sp, -4
-    sw ra, 0(sp)
-
-    li a0, 1
-    jal ra, Syscall_set_handbrake
-
-    lw ra, 0(sp)
-    addi sp, sp, 4
+    jal main
 
     ret
 
 .section .bss
 .align 4
 isr_stack:
-.skip 512
+.skip 1024
 isr_stack_end:
 
 .data
-.set base, 0xFFFF0100
-
-x_pos: .word 0
-
-y_pos: .word 0
-
-z_pos: .word 0
-
-x_ang: .word 0
-
-y_ang: .word 0
-
-z_ang: .word 0
-
-value_dist_sensor: .word 0
-
-num_carachters: .word 0
+.set base_gpt, 0xFFFF0100
+.set base_car, 0xFFFF0300
+.set base_serial, 0xFFFF0500 
