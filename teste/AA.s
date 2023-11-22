@@ -197,9 +197,9 @@ get_loop:
     mv a1, a0
     li t2, 1
     sb t2, 2(a1)
-read_test:
-    lb t2, 2(a1)
-    bne t2, zero, read_test
+    read_test:
+        lb t2, 2(a1)
+        bne t2, zero, read_test
     lb t1, 3(a1)
     beq t1, zero, gets_fim
     

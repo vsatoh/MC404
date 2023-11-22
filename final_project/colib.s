@@ -9,8 +9,10 @@
 .globl itoa
 .globl atoi
 .globl approx_sqrt
+.globl strlen_custom
 .globl get_distance
 .globl fill_and_pop
+
 
 set_engine:
     #a0 engine
@@ -58,51 +60,90 @@ get_time:
 
     ret
 
+# gets:
+#     #a0 string 
+#     #a1 string size
+#     mv t3, a0
+#     mv t4, a0
+
+#     for_gets:
+#         mv a0, t4
+#         li a1, 1
+#         li a7, 17
+#         ecall
+
+#         lb t0, 0(t4)
+#         li t1, 0
+#         beq t0, t1, fim_for_gets
+#         addi t4, t4, 1
+#         j for_gets
+#     fim_for_gets:
+#         mv a0, t3
+#     ret
 gets:
-    #a0 string 
-    #a1 string size
-    mv t3, a0
+    mv a4, a0
+    mv a6, a0
     mv t4, a0
-
-    for_gets:
-        mv a0, t4
-        li a1, 1
-        li a7, 17
-        ecall
-
-        lb t0, 0(t4)
-        li t1, 0
-        beq t0, t1, fim_for_gets
-        addi t4, t4, 1
-        j for_gets
-    fim_for_gets:
-        mv a0, t3
+get_loop:
+    mv a0, a4
+    li a1, 1
+    li a7, 17
+    ecall
+    lb t0, 0(a4)
+    beq t0, zero, get_end
+    li t5, 10
+    beq t5, t0, get_end
+    addi a4, a4, 1
+    j get_loop
+get_end:
+    li t0, 0
+    sb t0, 0(a4)
+    mv a0, a6
     ret
 
 puts:
-    #a0 string 
-    #a1 string size 
-    mv t3, a0
-    li t2, 0
+    mv a6, a0
+    li a1, 0
+read_size_str:
+    lb t1, 0(a6)
+    beq t1, zero, end_fix
+    addi a6, a6, 1
+    addi a1, a1, 1
+    j read_size_str
 
-    for_puts:
-        lb t0, 0(a0)
-        li t1, 0
-        beq t1, t0, fim_for_puts:
-        addi a0, a0, 1
-        addi t2, t2, 1
-        j for_puts
-    fim_for_puts:
-        addi t2, t2, 1
-        li t0, '\n'
-        sb t0, 0(a0)
+end_fix:
+    addi a1, a1, 1
+    li t5, '\n'
+    sb t5, 0(a6)
 
-    mv a0, t3
-    mv a1, t2
-    li a7, 18
+    li a7 , 18
     ecall
-
     ret
+
+# puts:
+#     #a0 string 
+#     #a1 string size 
+#     mv t3, a0
+#     li t2, 0
+
+#     for_puts:
+#         lb t0, 0(a0)
+#         li t1, 0
+#         beq t1, t0, fim_for_puts:
+#         addi a0, a0, 1
+#         addi t2, t2, 1
+#         j for_puts
+#     fim_for_puts:
+#         addi t2, t2, 1
+#         li t0, '\n'
+#         sb t0, 0(a0)
+
+#     mv a0, t3
+#     mv a1, t2
+#     li a7, 18
+#     ecall
+
+#     ret
 
 atoi:
     #(a0 char * str)
@@ -208,14 +249,16 @@ itoa:
 strlen_custom:
     #a0 str
     li t2, 0 #numero de caracteres
-
+    mv t3, a0
     for_strlen_custom:
         lb t0, 0(a0)
         li t1, 0
         beq t0, t1, fim_for_strlen_custom
         addi t2, t2, 1
-        j fim_for_strlen_custom
+        addi a0, a0, 1
+        j for_strlen_custom
     fim_for_strlen_custom:
+    mv a0, t3
     mv a0, t2
     ret
 
@@ -233,7 +276,7 @@ approx_sqrt:
 
         addi t2, t2, 1
 
-        beq t2, a1, fim_for_approx_sqrt
+        bge t2, a1, fim_for_approx_sqrt
         j for_approx_sqrt
 
     fim_for_approx_sqrt:
@@ -243,9 +286,9 @@ approx_sqrt:
 get_distance:
     #a0 x0, a1 y0, a2 z0, a3 x1, a4 y1, a5 z1
 
-    sub t0, a3, a0 #x - x0
-    sub t1, a4, a1 #y - y0
-    sub t2, a5, a2 #z - z0
+    sub t0, a0, a3 #x - x0
+    sub t1, a1, a4 #y - y0
+    sub t2, a2, a5 #z - z0
 
     mul t0, t0, t0 #(x - x0)^2
     mul t1, t1, t1 #(y - y0)^2
@@ -255,14 +298,14 @@ get_distance:
     add t0, t0, t2 #t0 = (x - x0)^2 + (y - y0)^2 + (z - z0)^2
 
     mv a0, t0
-    li a1, 10
+    li a1, 15
 
     addi sp, sp, -4
-    lw ra, 0(sp)
+    sw ra, 0(sp)
 
     jal approx_sqrt
 
-    sw ra, 0(sp)
+    lw ra, 0(sp)
     addi sp, sp, 4
 
     ret
