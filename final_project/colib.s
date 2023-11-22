@@ -3,6 +3,7 @@
 .globl set_handbrake
 .globl read_sensor_distance
 .globl get_position
+.globl get_rotation
 .globl get_time
 .globl gets
 .globl puts
@@ -60,90 +61,51 @@ get_time:
 
     ret
 
-# gets:
-#     #a0 string 
-#     #a1 string size
-#     mv t3, a0
-#     mv t4, a0
+ gets:
+     #a0 string 
+     #a1 string size
+     mv t3, a0
+     mv t4, a0
 
-#     for_gets:
-#         mv a0, t4
-#         li a1, 1
-#         li a7, 17
-#         ecall
+     for_gets:
+         mv a0, t3
+         li a1, 1
+         li a7, 17
+         ecall
 
-#         lb t0, 0(t4)
-#         li t1, 0
-#         beq t0, t1, fim_for_gets
-#         addi t4, t4, 1
-#         j for_gets
-#     fim_for_gets:
-#         mv a0, t3
-#     ret
-gets:
-    mv a4, a0
-    mv a6, a0
-    mv t4, a0
-get_loop:
-    mv a0, a4
-    li a1, 1
-    li a7, 17
-    ecall
-    lb t0, 0(a4)
-    beq t0, zero, get_end
-    li t5, 10
-    beq t5, t0, get_end
-    addi a4, a4, 1
-    j get_loop
-get_end:
-    li t0, 0
-    sb t0, 0(a4)
-    mv a0, a6
-    ret
+         lb t0, 0(t3)
+         li t1, 0
+         beq t0, t1, fim_for_gets
+         li t1, 10
+         beq t0, t1, fim_for_gets
+         addi t3, t3, 1
+         j for_gets
+     fim_for_gets:
+        li t0, 0
+        sb t0, 0(t3)
+        mv a0, t4
+        ret
 
 puts:
-    mv a6, a0
+    #a0 string 
+    #a1 string size 
+    mv t3, a0
     li a1, 0
-read_size_str:
-    lb t1, 0(a6)
-    beq t1, zero, end_fix
-    addi a6, a6, 1
-    addi a1, a1, 1
-    j read_size_str
+    for_puts:
+        lb t0, 0(t3)
+        li t1, 0
+        beq t1, t0, fim_for_puts
+        addi t3, t3, 1
+        addi a1, a1, 1
+        j for_puts
+    fim_for_puts:
+        addi a1, a1, 1
+        li t0, '\n'
+        sb t0, 0(t3)
 
-end_fix:
-    addi a1, a1, 1
-    li t5, '\n'
-    sb t5, 0(a6)
-
-    li a7 , 18
-    ecall
-    ret
-
-# puts:
-#     #a0 string 
-#     #a1 string size 
-#     mv t3, a0
-#     li t2, 0
-
-#     for_puts:
-#         lb t0, 0(a0)
-#         li t1, 0
-#         beq t1, t0, fim_for_puts:
-#         addi a0, a0, 1
-#         addi t2, t2, 1
-#         j for_puts
-#     fim_for_puts:
-#         addi t2, t2, 1
-#         li t0, '\n'
-#         sb t0, 0(a0)
-
-#     mv a0, t3
-#     mv a1, t2
-#     li a7, 18
-#     ecall
-
-#     ret
+        li a7, 18
+        ecall
+        ret
 
 atoi:
     #(a0 char * str)

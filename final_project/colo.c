@@ -200,5 +200,3 @@ int main(){
     }
     set_handbrake(1);
 }
-colo.c
-Exibindo colo.c…
