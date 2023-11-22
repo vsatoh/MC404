@@ -52,9 +52,8 @@ int_handler:
         blt a0, t0, fail_set_engine_and_steering
 
         sb a1, 32(a3)
-        addi a3, a3, 1
         sb a0, 33(a3)
-
+        li a0, 0
         j fim_syscall
 
         fail_set_engine_and_steering:
@@ -129,11 +128,11 @@ int_handler:
         lw t0, 0(a3) #x0
         sw t0, 0(a0)
 
-        addi t0, t0, 4
+        addi a3, a3, 4
         lw t0, 0(a3) #y0
         sw t0, 0(a1)
 
-        addi t0, t0, 4
+        addi a3, a3, 4
         lw t0, 0(a3) #z0
         sw t0, 0(a2)
         
@@ -153,11 +152,11 @@ int_handler:
         lw t0, 0(a3) #x0
         sw t0, 0(a0)
 
-        addi t0, t0, 4
+        addi a3, a3, 4
         lw t0, 0(a3) #y0
         sw t0, 0(a1)
 
-        addi t0, t0, 4
+        addi a3, a3, 4
         lw t0, 0(a3) #z0
         sw t0, 0(a2)
         
@@ -180,6 +179,9 @@ int_handler:
 
             lb t0, 3(a3)
             sb t0, 0(a0)
+
+            li t1, 0
+            beq t0, t1, fim_for_read_serial
 
             addi a0, a0, 1
             addi t2, t2, 1
