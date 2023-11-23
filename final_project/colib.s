@@ -123,7 +123,7 @@ atoi:
         add a5, a3, a5
         brk2:
         addi a0, a0, 1
-        lb a3, 0(a0)
+        lb a3, 0(a0)    
         j for2
 
     num_neg:

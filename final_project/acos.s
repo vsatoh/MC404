@@ -39,10 +39,8 @@ int_handler:
 
     Syscall_set_engine_and_steering:
 
-        la a3, base_car
-
-        li t0, 128
-        bge a1, t0, fail_set_engine_and_steering
+        li t0, 127
+        blt t0, a1, fail_set_engine_and_steering
         li t0, -127
         blt a1, t0, fail_set_engine_and_steering
 
@@ -51,8 +49,10 @@ int_handler:
         li t0, -1
         blt a0, t0, fail_set_engine_and_steering
 
-        sb a1, 32(a3)
+        la a3, base_car
+
         sb a0, 33(a3)
+        sb a1, 32(a3)
         li a0, 0
         j fim_syscall
 
@@ -132,18 +132,15 @@ int_handler:
         busy_waiting_get_position: #n avancar enquanto n terminar a leitura
             lb t0, 0(a3)
             li t1, 0
-        bne t0, t1, busy_waiting_get_position
+            bne t0, t1, busy_waiting_get_position
 
-        addi a3, a3, 16
-        lw t0, 0(a3) #x0
+        lw t0, 16(a3) #x0
         sw t0, 0(a0)
 
-        addi a3, a3, 4
-        lw t0, 0(a3) #y0
+        lw t0, 20(a3) #y0
         sw t0, 0(a1)
 
-        addi a3, a3, 4
-        lw t0, 0(a3) #z0
+        lw t0, 24(a3) #z0
         sw t0, 0(a2)
         
         j fim_syscall
@@ -158,16 +155,13 @@ int_handler:
             li t1, 0
         bne t0, t1, busy_waiting_get_rotation
 
-        addi a3, a3, 4
-        lw t0, 0(a3) #x0
+        lw t0, 4(a3) #x0
         sw t0, 0(a0)
 
-        addi a3, a3, 4
-        lw t0, 0(a3) #y0
+        lw t0, 8(a3) #y0
         sw t0, 0(a1)
 
-        addi a3, a3, 4
-        lw t0, 0(a3) #z0
+        lw t0, 12(a3) #z0
         sw t0, 0(a2)
         
         j fim_syscall
@@ -233,10 +227,10 @@ int_handler:
     Syscall_get_systime:
         la a3, base_gpt
         li t0, 1
-        sb t0, 0(a3)
+        sw t0, 0(a3)
 
         busy_waiting_get_systime:
-            lb t0, 0(a3)
+            lw t0, 0(a3)
             li t1, 0
         bne t0, t1, busy_waiting_get_systime 
 
