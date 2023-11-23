@@ -51,6 +51,7 @@ get_position:
 get_rotation:
     #a0, a1, a2 vao receber os enderecos de memoria para a_x, a_y e a_xz
     li a7, 16
+    ecall
 
     ret
 
@@ -61,35 +62,35 @@ get_time:
     ret
 
  gets:
-     #a0 string 
-     #a1 string size
-     mv t3, a0
-     mv t4, a0
+    #a0 string 
+    #a1 string size
+    mv t3, a0
+    mv t4, a0 #ponteiro para a posicao inical do buffer
 
-     for_gets:
-         mv a0, t3
-         li a1, 1
-         li a7, 17
-         ecall
+    for_gets:
+        mv a0, t3
+        li a1, 1
+        li a7, 17
+        ecall
 
-         lb t0, 0(t3)
-         li t1, 0
-         beq t0, t1, fim_for_gets
-         li t1, 10
-         beq t0, t1, fim_for_gets
-         addi t3, t3, 1
-         j for_gets
-     fim_for_gets:
-        li t0, 0
-        sb t0, 0(t3)
-        mv a0, t4
-        ret
+        lb t0, 0(t3)
+        li t1, 0
+        beq t0, t1, fim_for_gets
+        li t1, 10
+        beq t0, t1, fim_for_gets
+        addi t3, t3, 1
+        j for_gets
+    fim_for_gets:
+    li t0, 0
+    sb t0, 0(t3)
+    mv a0, t4
+    ret
 
 puts:
     #a0 string 
     #a1 string size 
     mv t3, a0
-    li a1, 0
+    li a1, 0 #numero de caracteres
     for_puts:
         lb t0, 0(t3)
         li t1, 0
@@ -99,7 +100,7 @@ puts:
         j for_puts
     fim_for_puts:
         addi a1, a1, 1
-        li t0, '\n'
+        li t0, '\n' #colocaca um \n para imprimir
         sb t0, 0(t3)
 
         li a7, 18
@@ -200,8 +201,6 @@ itoa:
     mv a1, t4
     mv a0, a1
     ret
-
-
 
 strlen_custom:
     #a0 str
