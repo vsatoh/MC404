@@ -62,9 +62,19 @@ int_handler:
 
     Syscall_set_handbrake:
 
+        li t0, 0
+        beq t0, a0, check_handbrake
+        li t0, 1
+        beq t0, a0, check_handbrake
+        li a0, -1
+        j fim_syscall
+
+        check_handbrake:
         la a3, base_car
         addi a3, a3, 34
         sb a0, 0(a3)
+
+        li a0, 0
 
         j fim_syscall
 
@@ -254,17 +264,6 @@ int_handler:
     csrw mepc, t0 
     mret          
 
-user_mode:
-    csrr t1, mstatus       
-    li t2, ~0x1800         
-    and t1, t1, t2          
-    csrw mstatus, t1
- 
-    la t0, main       
-    csrw mepc, t0          
-
-    mret
-
 _start:
 
     li sp, 0x07FFFFFC
@@ -285,11 +284,15 @@ _start:
     ori t1, t1, 0x8 # do registrador mstatus
     csrw mstatus, t1
 
-    jal user_mode
+    csrr t1, mstatus       
+    li t2, ~0x1800         
+    and t1, t1, t2          
+    csrw mstatus, t1
+ 
+    la t0, main       
+    csrw mepc, t0  
 
-    jal main
-
-    ret
+    mret
 
 .section .bss
 .align 4

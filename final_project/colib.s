@@ -28,7 +28,6 @@ set_engine:
 set_handbrake:
     #a0 parametro 1 ou 0
     #return int
-    addi a0, a0, -48
     li a7, 11
     ecall
     #retornar parametro em a0
@@ -152,25 +151,18 @@ atoi:
 
 itoa:
     #a0 num, a1 str saida, a2 base
+    mv t4, a1
     li t1, 0
     bge a0, t1, for_char_itoa
-    li t1, 16
-    bne t1, a2, neg_b10
 
-    li t1, 4294967295
-    addi a0, a0, 1
-    add a0, t1, a0
-    li t1, 0
-    j for_char_itoa
-
-    neg_b10:
-        li t1, 45
-        sb t1, 0(a1)
-        li t1, -1
-        mul a0, a0, t1
-        addi a1, a1, 1
-        li t1, 0
-
+    li t1, 45
+    sb t1, 0(a1)
+    li t1, -1
+    mul a0, a0, t1
+    li t0, '-'
+    sb t0, 0(a1)
+    addi a1, a1, 1
+    addi t1, t1, 1
     for_char_itoa:
         addi t1, t1, 1 #numero de digitos
         remu t0, a0, a2 #resto da divisao
@@ -184,29 +176,32 @@ itoa:
         hexa:
             addi t0, t0, 55
         fim_hexa:
-        sb t0, 0(a3) #a3 armazena temporariamente a string
-        addi a3, a3, 1
+
+        addi sp, sp, -1
+        sb t0, 0(sp) #a3 armazena temporariamente a string
         #pegar resto e inverter lista
         li t0, 0
         beq t0, a0, fim_for_char_itoa
         j for_char_itoa
     fim_for_char_itoa:
-    addi a3, a3, -1
     li t0, 0
+
     for_char_itoa2:
         beq t0, t1, fim_for_char_itoa2
-        lb a4, 0(a3)
-        sb a4, 0(a1)
-        addi a3, a3, -1
-        addi a1, a1, 1
+        lb t2, 0(sp)
+        sb t2, 0(a1)
+        addi sp, sp, 1
         addi t0, t0, 1
+        addi a1, a1, 1
         j for_char_itoa2
     fim_for_char_itoa2:
-    li a4, 0
-    sb a4, 0(a1)
-    sub a1, a1, t1
+    li t0, 0
+    sb t0, 0(a1)
+    mv a1, t4
     mv a0, a1
     ret
+
+
 
 strlen_custom:
     #a0 str
